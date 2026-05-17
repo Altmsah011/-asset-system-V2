@@ -4,182 +4,62 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>نظام تتبع الأصول</title>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; min-height: 100vh; }
-  .page { display: none; }
-  .active { display: block; }
-  
-  .login-card { max-width: 380px; margin: 50px auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
-  .logo { text-align: center; margin-bottom: 1.5rem; font-size: 48px; }
-  input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px; font-size: 15px; }
-  .btn { width: 100%; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-  .btn:disabled { background: #a5b4fc; }
+  .login-card { max-width: 380px; margin: 40px auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+  input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; font-size: 15px; }
+  input { border: 1px solid #ddd; }
+  button { background: #4f46e5; color: white; border: none; cursor: pointer; font-weight: bold; }
   .error { color: #dc2626; text-align: center; margin: 10px 0; }
-
-  .navbar { background: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  .content { padding: 1.5rem; max-width: 800px; margin: 0 auto; }
-  .section { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 </style>
 </head>
 <body>
 
-<!-- Login Page -->
-<div id="loginPage" class="page active">
-  <div class="login-card">
-    <div class="logo">📦</div>
-    <h1 style="text-align:center;margin-bottom:8px;">نظام تتبع الأصول</h1>
-    <p style="text-align:center;color:#666;margin-bottom:20px;">V2 - Multi Site</p>
-    
-    <input type="text" id="username" placeholder="اسم المستخدم" />
-    <input type="password" id="password" placeholder="كلمة المرور" />
-    <button class="btn" onclick="doLogin()">دخول</button>
-    <div class="error" id="loginError"></div>
-  </div>
-</div>
-
-<!-- Main Page -->
-<div id="mainPage" class="page">
-  <div class="navbar">
-    <h2>📦 نظام تتبع الأصول</h2>
-    <div>
-      <span id="userInfo" style="margin-left:15px;"></span>
-      <button onclick="logout()" style="margin-right:10px;background:#fee2e2;color:#dc2626;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">خروج</button>
-    </div>
-  </div>
-  <div class="content">
-    <div style="background:#f0abfc;color:#6b21a8;padding:10px 16px;border-radius:9999px;display:inline-block;margin-bottom:20px;" id="locationBadge"></div>
-    
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div onclick="showPage('movement')" style="background:white;padding:2rem;text-align:center;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);cursor:pointer;">
-        <div style="font-size:48px;margin-bottom:12px;">🔄</div>
-        <h3>تسجيل حركة نقل</h3>
-      </div>
-      <div onclick="showPage('devices')" style="background:white;padding:2rem;text-align:center;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);cursor:pointer;">
-        <div style="font-size:48px;margin-bottom:12px;">🖥️</div>
-        <h3>عرض الأجهزة</h3>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Movement Page -->
-<div id="movementPage" class="page">
-  <!-- سنضيف محتوى صفحة الحركة كاملة بعد التأكيد -->
-  <div class="navbar">
-    <button onclick="showPage('main')" style="background:none;border:none;font-size:20px;cursor:pointer;">←</button>
-    <h2>تسجيل حركة نقل</h2>
-  </div>
-  <div class="content" id="movementContent">
-    <!-- سيتم ملؤها ديناميكياً -->
-    <p>جاري تحميل صفحة الحركة...</p>
-  </div>
-</div>
-
-<!-- Devices Page -->
-<div id="devicesPage" class="page">
-  <div class="navbar">
-    <button onclick="showPage('main')" style="background:none;border:none;font-size:20px;cursor:pointer;">←</button>
-    <h2>عرض الأجهزة</h2>
-  </div>
-  <div class="content" id="devicesContent">
-    <p>جاري تحميل الأجهزة...</p>
-  </div>
+<div class="login-card">
+  <h1 style="text-align:center;margin-bottom:20px;">📦 نظام تتبع الأصول</h1>
+  <input type="text" id="username" placeholder="اسم المستخدم" value="admin" />
+  <input type="password" id="password" placeholder="كلمة المرور" value="admin" />
+  <button onclick="doLogin()">دخول</button>
+  <div class="error" id="errorMsg"></div>
 </div>
 
 <script>
-// ==================== CONFIG ====================
 const API_URL = "https://script.google.com/macros/s/AKfycbxe6wbuqxp_5XbipgBdxYlR8c-NoRgUV7h15Ld7WRwjYgHZA7Ed_gyfckdu4XMRAmMT/exec";
 
-let currentUser = null;
-
-// ==================== API Call (JSONP) ====================
-async function api(action, params = {}) {
-  return new Promise((resolve, reject) => {
-    const callbackName = 'jsonp_callback_' + Math.random().toString(36).substring(2);
-    const dataStr = encodeURIComponent(JSON.stringify(params));
-    const url = `${API_URL}?callback=${callbackName}&action=${action}&data=${dataStr}`;
-
-    window[callbackName] = function(response) {
-      delete window[callbackName];
-      resolve(response);
-    };
-
-    const script = document.createElement('script');
-    script.src = url;
-    script.onerror = () => {
-      delete window[callbackName];
-      reject(new Error("فشل الاتصال بالسيرفر"));
-    };
-    document.head.appendChild(script);
-
-    setTimeout(() => {
-      if (window[callbackName]) {
-        delete window[callbackName];
-        reject(new Error("انتهت مهلة الطلب"));
-      }
-    }, 25000);
-  });
-}
-
-// ==================== Login ====================
 async function doLogin() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
-  const errorEl = document.getElementById('loginError');
+  const errorMsg = document.getElementById('errorMsg');
+
+  errorMsg.textContent = '';
 
   if (!username || !password) {
-    errorEl.textContent = "يرجى إدخال اسم المستخدم وكلمة المرور";
-    errorEl.style.display = 'block';
+    errorMsg.textContent = "يرجى إدخال اسم المستخدم وكلمة المرور";
     return;
   }
 
   try {
-    const result = await api('login', { username, password });
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', username, password })
+    });
+
+    const result = await response.json();
+
     if (result.success) {
-      currentUser = result.user;
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      showMainPage();
+      alert("✅ تم تسجيل الدخول بنجاح!\n\n" + result.user.fullName);
+      console.log("User:", result.user);
+      // هنا هننتقل للصفحة الرئيسية لاحقاً
     } else {
-      errorEl.textContent = result.message || "بيانات الدخول غير صحيحة";
-      errorEl.style.display = 'block';
+      errorMsg.textContent = result.message || "بيانات دخول غير صحيحة";
     }
-  } catch(e) {
-    errorEl.textContent = "حدث خطأ في الاتصال";
-    errorEl.style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    errorMsg.textContent = "حدث خطأ في الاتصال بالسيرفر";
   }
 }
-
-function showMainPage() {
-  document.getElementById('loginPage').classList.remove('active');
-  document.getElementById('mainPage').classList.add('active');
-  document.getElementById('userInfo').textContent = currentUser.fullName;
-  document.getElementById('locationBadge').textContent = `📍 ${currentUser.locationName}`;
-}
-
-function logout() {
-  localStorage.removeItem('currentUser');
-  location.reload();
-}
-
-// ==================== Page Navigation ====================
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(page + 'Page').classList.add('active');
-
-  if (page === 'movement') loadMovementPage();
-  if (page === 'devices') loadDevicesPage();
-}
-
-// ==================== Init ====================
-window.onload = () => {
-  const saved = localStorage.getItem('currentUser');
-  if (saved) {
-    currentUser = JSON.parse(saved);
-    showMainPage();
-  }
-};
 </script>
 </body>
 </html>
