@@ -8,21 +8,11 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --primary: #4f46e5;
-  --primary-dark: #4338ca;
-  --primary-light: #ede9fe;
-  --success: #22c55e;
-  --danger: #dc2626;
-  --bg: #f0f2f5;
-  --white: #ffffff;
-  --border: #e0e0e0;
-  --text: #1a1a2e;
-  --text-light: #666;
-  --text-muted: #888;
-  --shadow: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
-  --radius: 12px;
-  --radius-lg: 16px;
+  --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #ede9fe;
+  --success: #22c55e; --danger: #dc2626; --bg: #f0f2f5; --white: #ffffff;
+  --border: #e0e0e0; --text: #1a1a2e; --text-light: #666; --text-muted: #888;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06); --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
+  --radius: 12px; --radius-lg: 16px;
 }
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); }
 .page { display: none; }
@@ -35,9 +25,9 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); min-h
 .logo p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .form-group { margin-bottom: 1rem; }
 .form-group label { font-size: 13px; color: var(--text-light); display: block; margin-bottom: 6px; }
-.form-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; font-family: inherit; }
+.form-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
 .form-group input:focus { border-color: var(--primary); }
-.btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: .5rem; font-family: inherit; transition: background 0.2s; }
+.btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: .5rem; font-family: inherit; }
 .btn-primary:hover { background: var(--primary-dark); }
 .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
 .alert-error { background: #fef2f2; color: var(--danger); padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 1rem; text-align: center; display: none; }
@@ -62,13 +52,13 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); min-h
 .form-row { margin-bottom: .875rem; }
 .form-row label { font-size: 12px; color: var(--text-light); display: block; margin-bottom: 5px; }
 .input-wrap { position: relative; display: flex; align-items: center; }
-.input-wrap input, .input-wrap select, .form-row select, .form-row input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; background: var(--white); font-family: inherit; transition: border 0.2s; }
+.input-wrap input, .input-wrap select, .form-row select, .form-row input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; background: var(--white); font-family: inherit; }
 .input-wrap input:focus, .input-wrap select:focus, .form-row select:focus, .form-row input:focus { border-color: var(--primary); }
 .scan-btn { position: absolute; left: 8px; background: none; border: none; cursor: pointer; font-size: 20px; padding: 4px; }
 .add-btn { background: var(--success); color: white; border: none; border-radius: 6px; padding: 6px 10px; font-size: 18px; cursor: pointer; margin-right: 6px; flex-shrink: 0; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 .auto-badge { font-size: 11px; background: var(--primary-light); color: #5b21b6; padding: 2px 8px; border-radius: 10px; margin-right: 6px; }
-.submit-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 16px; cursor: pointer; margin-top: .5rem; font-family: inherit; transition: background 0.2s; }
+.submit-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 16px; cursor: pointer; margin-top: .5rem; font-family: inherit; }
 .submit-btn:hover { background: var(--primary-dark); }
 .submit-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
 .devices-content { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
@@ -336,58 +326,80 @@ let addModalState = { field: null, column: null, floorField: null };
 let lookupTimeout = null, lastSerial = '', lastAsset = '', autoFilled = false;
 let html5QrCode = null, scannerActive = false;
 
-function api(action, params = {}) {
-  return new Promise((resolve, reject) => {
-    const cbName = 'cb_' + Math.random().toString(36).slice(2);
-    const url = API_URL + '?callback=' + cbName + '&action=' + encodeURIComponent(action) + '&data=' + encodeURIComponent(JSON.stringify(params));
+function api(action, params) {
+  params = params || {};
+  return new Promise(function(resolve, reject) {
+    var cbName = 'cb_' + Math.random().toString(36).slice(2);
+    var dataStr = encodeURIComponent(JSON.stringify(params));
+    var url = API_URL + '?callback=' + encodeURIComponent(cbName) + '&action=' + encodeURIComponent(action) + '&data=' + dataStr;
     window[cbName] = function(result) {
       delete window[cbName];
       if (script.parentNode) script.parentNode.removeChild(script);
       resolve(result);
     };
-    const script = document.createElement('script');
+    var script = document.createElement('script');
     script.src = url;
-    script.onerror = () => { delete window[cbName]; reject(new Error('خطأ في الاتصال')); };
+    script.onerror = function() {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('خطأ في الاتصال'));
+    };
     document.head.appendChild(script);
-    setTimeout(() => { if (window[cbName]) { delete window[cbName]; if (script.parentNode) script.parentNode.removeChild(script); reject(new Error('انتهت مهلة الاتصال')); } }, 30000);
+    setTimeout(function() {
+      if (window[cbName]) {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error('انتهت مهلة الاتصال'));
+      }
+    }, 30000);
   });
 }
 
-function showLoading(text) { document.getElementById('loadingText').textContent = text || 'جاري التحميل...'; document.getElementById('loadingOverlay').classList.add('show'); }
+function showLoading(text) {
+  document.getElementById('loadingText').textContent = text || 'جاري التحميل...';
+  document.getElementById('loadingOverlay').classList.add('show');
+}
 function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
-function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
 
 async function doLogin() {
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value.trim();
   if (!username || !password) { showLoginError('من فضلك اكتب اسم المستخدم وكلمة المرور'); return; }
-  const btn = document.getElementById('loginBtn');
+  var btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = 'جاري التحقق...';
   document.getElementById('loginError').style.display = 'none';
   try {
     showLoading('جاري التحقق...');
-    const result = await api('login', { username, password });
+    var result = await api('login', { username: username, password: password });
     hideLoading(); btn.disabled = false; btn.textContent = 'دخول';
     if (result.success) {
       currentUser = result.user;
       sessionStorage.setItem('ats_user', JSON.stringify(currentUser));
       await loadSettingsAndShowHome();
     } else { showLoginError(result.message || 'اسم المستخدم أو الباسورد غلط'); }
-  } catch (e) { hideLoading(); btn.disabled = false; btn.textContent = 'دخول'; showLoginError('حدث خطأ في الاتصال، حاول تاني'); }
+  } catch(e) { hideLoading(); btn.disabled = false; btn.textContent = 'دخول'; showLoginError('حدث خطأ في الاتصال، حاول تاني'); }
 }
 
-function showLoginError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
+function showLoginError(msg) { var el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
 
 async function loadSettingsAndShowHome() {
   showLoading('جاري تحميل البيانات...');
-  try { const r = await api('getSettings', { spreadsheetId: currentUser.spreadsheetId }); if (r.success) settings = r.data || {}; } catch (e) { settings = {}; }
+  try { var r = await api('getSettings', { spreadsheetId: currentUser.spreadsheetId }); if (r.success) settings = r.data || {}; } catch(e) { settings = {}; }
   hideLoading();
   document.getElementById('homeLocation').textContent = currentUser.locationName;
   document.getElementById('homeUsername').textContent = currentUser.fullName;
   showPage('homePage');
 }
 
-function doLogout() { currentUser = null; settings = {}; allDevices = []; sessionStorage.removeItem('ats_user'); showPage('loginPage'); }
+function doLogout() {
+  currentUser = null; settings = {}; allDevices = [];
+  sessionStorage.removeItem('ats_user');
+  showPage('loginPage');
+}
 
 function showMovementPage() {
   document.getElementById('movLocation').textContent = currentUser.locationName;
@@ -396,7 +408,7 @@ function showMovementPage() {
 
 async function showDevicesPage() {
   showPage('devicesPage'); showLoading('جاري تحميل الأجهزة...');
-  try { const r = await api('getDevices', { spreadsheetId: currentUser.spreadsheetId }); allDevices = r.success ? (r.data || []) : []; } catch (e) { allDevices = []; }
+  try { var r = await api('getDevices', { spreadsheetId: currentUser.spreadsheetId }); allDevices = r.success ? (r.data || []) : []; } catch(e) { allDevices = []; }
   hideLoading(); populateDeviceFloorFilter(); renderDevices(allDevices);
 }
 
@@ -407,29 +419,37 @@ function populateMovementSelects() {
 }
 
 function fillSelect(id, items) {
-  const sel = document.getElementById(id), val = sel.value;
+  var sel = document.getElementById(id), val = sel.value;
   sel.innerHTML = '<option value="">-- اختر --</option>';
-  (items || []).forEach(i => { const o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o); });
+  (items || []).forEach(function(i) { var o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o); });
   if (val) sel.value = val;
 }
 
 function fillFloors(id, floors) {
-  const sel = document.getElementById(id);
+  var sel = document.getElementById(id);
   sel.innerHTML = '<option value="">-- اختر --</option>';
-  (floors || []).forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
+  (floors || []).forEach(function(f) { var o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
 }
 
 function filterFromRooms() { filterRooms('fromRoom', document.getElementById('fromFloor').value); }
 function filterToRooms() { filterRooms('toRoom', document.getElementById('toFloor').value); }
 function filterRooms(id, floor) {
-  const sel = document.getElementById(id);
+  var sel = document.getElementById(id);
   sel.innerHTML = '<option value="">-- اختر --</option>';
-  (settings.rooms || []).filter(r => !floor || r.floor === floor).forEach(r => { const o = document.createElement('option'); o.value = r.name; o.textContent = r.name; sel.appendChild(o); });
+  (settings.rooms || []).filter(function(r) { return !floor || r.floor === floor; }).forEach(function(r) {
+    var o = document.createElement('option'); o.value = r.name; o.textContent = r.name; sel.appendChild(o);
+  });
 }
 
 function fillSeats() {
-  ['fromSeatNum','toSeatNum'].forEach(id => { const s = document.getElementById(id); s.innerHTML = '<option value="">--</option>'; for (let i=1;i<=25;i++) { const o=document.createElement('option'); o.value=i; o.textContent=i; s.appendChild(o); } });
-  ['fromSeatLetter','toSeatLetter'].forEach(id => { const s = document.getElementById(id); s.innerHTML = '<option value="">--</option>'; for (let c=65;c<=90;c++) { const o=document.createElement('option'); o.value=String.fromCharCode(c); o.textContent=String.fromCharCode(c); s.appendChild(o); } });
+  ['fromSeatNum','toSeatNum'].forEach(function(id) {
+    var s = document.getElementById(id); s.innerHTML = '<option value="">--</option>';
+    for (var i=1; i<=25; i++) { var o=document.createElement('option'); o.value=i; o.textContent=i; s.appendChild(o); }
+  });
+  ['fromSeatLetter','toSeatLetter'].forEach(function(id) {
+    var s = document.getElementById(id); s.innerHTML = '<option value="">--</option>';
+    for (var c=65; c<=90; c++) { var o=document.createElement('option'); o.value=String.fromCharCode(c); o.textContent=String.fromCharCode(c); s.appendChild(o); }
+  });
 }
 
 function onSerialInput() { if (!document.getElementById('serial').value.trim() && autoFilled) clearAutoFilled(); }
@@ -438,71 +458,85 @@ function onAssetInput() { if (!document.getElementById('assetNumber').value.trim
 function onAssetChange() { if (document.getElementById('assetNumber').value.trim()) triggerLookup(); else if (autoFilled) clearAutoFilled(); }
 
 function triggerLookup() {
-  const serial = document.getElementById('serial').value.trim(), asset = document.getElementById('assetNumber').value.trim();
+  var serial = document.getElementById('serial').value.trim();
+  var asset = document.getElementById('assetNumber').value.trim();
   if (!serial && !asset) return;
   if (serial === lastSerial && asset === lastAsset) return;
   clearTimeout(lookupTimeout);
-  lookupTimeout = setTimeout(async () => {
+  lookupTimeout = setTimeout(async function() {
     lastSerial = serial; lastAsset = asset;
     try {
-      const result = await api('lookupDevice', { spreadsheetId: currentUser.spreadsheetId, serial, assetNumber: asset });
+      var result = await api('lookupDevice', { spreadsheetId: currentUser.spreadsheetId, serial: serial, assetNumber: asset });
       if (result.success && result.device) {
-        autoFilled = true; const d = result.device;
+        autoFilled = true; var d = result.device;
         if (d.serial) document.getElementById('serial').value = d.serial;
         if (d.assetNumber) document.getElementById('assetNumber').value = d.assetNumber;
         if (d.deviceType) document.getElementById('deviceType').value = d.deviceType;
         if (d.department) document.getElementById('department').value = d.department;
         if (d.currentLocation) document.getElementById('fromLocation').value = d.currentLocation;
-        if (d.floor) { document.getElementById('fromFloor').value = d.floor; filterFromRooms(); setTimeout(() => { if (d.room) document.getElementById('fromRoom').value = d.room; }, 100); }
+        if (d.floor) { document.getElementById('fromFloor').value = d.floor; filterFromRooms(); setTimeout(function() { if (d.room) document.getElementById('fromRoom').value = d.room; }, 100); }
         if (d.seatNumber) document.getElementById('fromSeatNum').value = d.seatNumber;
         if (d.seatLetter) document.getElementById('fromSeatLetter').value = d.seatLetter;
       }
-    } catch (e) {}
+    } catch(e) {}
   }, 600);
 }
 
 function clearAutoFilled() {
   autoFilled = false; lastSerial = ''; lastAsset = '';
-  ['assetNumber','deviceType','department','fromLocation','fromFloor','fromRoom','fromSeatNum','fromSeatLetter'].forEach(id => document.getElementById(id).value = '');
+  ['assetNumber','deviceType','department','fromLocation','fromFloor','fromRoom','fromSeatNum','fromSeatLetter'].forEach(function(id) { document.getElementById(id).value = ''; });
 }
 
 async function submitMovement() {
-  const serial = document.getElementById('serial').value.trim(), asset = document.getElementById('assetNumber').value.trim();
+  var serial = document.getElementById('serial').value.trim();
+  var asset = document.getElementById('assetNumber').value.trim();
   if (!serial && !asset) { showMovError('لازم تكتب Serial Number أو رقم الأصل'); return; }
   if (!document.getElementById('toLocation').value) { showMovError('لازم تختار الموقع الجديد'); return; }
-  const btn = document.getElementById('submitBtn');
+  var btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
   document.getElementById('movError').style.display = 'none';
-  const movementData = {
-    serial, assetNumber: asset,
-    deviceType: document.getElementById('deviceType').value, department: document.getElementById('department').value,
-    fromLocation: document.getElementById('fromLocation').value, fromFloor: document.getElementById('fromFloor').value,
-    fromRoom: document.getElementById('fromRoom').value, fromSeatNum: document.getElementById('fromSeatNum').value,
-    fromSeatLetter: document.getElementById('fromSeatLetter').value, toLocation: document.getElementById('toLocation').value,
-    toFloor: document.getElementById('toFloor').value, toRoom: document.getElementById('toRoom').value,
-    toSeatNum: document.getElementById('toSeatNum').value, toSeatLetter: document.getElementById('toSeatLetter').value,
-    ticketNumber: document.getElementById('ticketNumber').value, notes: document.getElementById('notes').value
+  var movementData = {
+    serial: serial, assetNumber: asset,
+    deviceType: document.getElementById('deviceType').value,
+    department: document.getElementById('department').value,
+    fromLocation: document.getElementById('fromLocation').value,
+    fromFloor: document.getElementById('fromFloor').value,
+    fromRoom: document.getElementById('fromRoom').value,
+    fromSeatNum: document.getElementById('fromSeatNum').value,
+    fromSeatLetter: document.getElementById('fromSeatLetter').value,
+    toLocation: document.getElementById('toLocation').value,
+    toFloor: document.getElementById('toFloor').value,
+    toRoom: document.getElementById('toRoom').value,
+    toSeatNum: document.getElementById('toSeatNum').value,
+    toSeatLetter: document.getElementById('toSeatLetter').value,
+    ticketNumber: document.getElementById('ticketNumber').value,
+    notes: document.getElementById('notes').value
   };
   try {
-    const result = await api('saveMovement', { spreadsheetId: currentUser.spreadsheetId, locationName: currentUser.locationName, movementData, userFullName: currentUser.fullName });
+    var result = await api('saveMovement', {
+      spreadsheetId: currentUser.spreadsheetId,
+      locationName: currentUser.locationName,
+      movementData: movementData,
+      userFullName: currentUser.fullName
+    });
     btn.disabled = false; btn.textContent = '✅ تسجيل الحركة';
     if (result.success) {
-      const s = document.getElementById('movSuccess'); s.style.display = 'block';
+      var s = document.getElementById('movSuccess'); s.style.display = 'block';
       autoFilled = false; lastSerial = ''; lastAsset = '';
-      setTimeout(() => { s.style.display = 'none'; resetMovementForm(); }, 2000);
+      setTimeout(function() { s.style.display = 'none'; resetMovementForm(); }, 2000);
     } else { showMovError(result.message || 'حدث خطأ'); }
-  } catch (e) { btn.disabled = false; btn.textContent = '✅ تسجيل الحركة'; showMovError('حدث خطأ في الاتصال'); }
+  } catch(e) { btn.disabled = false; btn.textContent = '✅ تسجيل الحركة'; showMovError('حدث خطأ في الاتصال'); }
 }
 
-function showMovError(msg) { const e = document.getElementById('movError'); e.textContent = msg; e.style.display = 'block'; }
+function showMovError(msg) { var e = document.getElementById('movError'); e.textContent = msg; e.style.display = 'block'; }
 function resetMovementForm() {
-  ['serial','assetNumber','ticketNumber','notes'].forEach(id => document.getElementById(id).value = '');
-  ['deviceType','department','fromLocation','fromFloor','fromRoom','fromSeatNum','fromSeatLetter','toLocation','toFloor','toRoom','toSeatNum','toSeatLetter'].forEach(id => document.getElementById(id).value = '');
+  ['serial','assetNumber','ticketNumber','notes'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['deviceType','department','fromLocation','fromFloor','fromRoom','fromSeatNum','fromSeatLetter','toLocation','toFloor','toRoom','toSeatNum','toSeatLetter'].forEach(function(id) { document.getElementById(id).value = ''; });
 }
 
 function openAddModal(field, column, floorField) {
-  addModalState = { field, column, floorField: floorField || null };
-  const titles = { deviceType:'إضافة نوع جهاز', department:'إضافة إدارة', fromRoom:'إضافة صالة/غرفة', toRoom:'إضافة صالة/غرفة', toLocation:'إضافة موقع' };
+  addModalState = { field: field, column: column, floorField: floorField || null };
+  var titles = { deviceType:'إضافة نوع جهاز', department:'إضافة إدارة', fromRoom:'إضافة صالة/غرفة', toRoom:'إضافة صالة/غرفة', toLocation:'إضافة موقع' };
   document.getElementById('addModalTitle').textContent = titles[field] || 'إضافة جديد';
   document.getElementById('addModalInput').value = '';
   document.getElementById('addModal').classList.add('show');
@@ -510,62 +544,84 @@ function openAddModal(field, column, floorField) {
 function closeAddModal() { document.getElementById('addModal').classList.remove('show'); }
 
 async function confirmAdd() {
-  const value = document.getElementById('addModalInput').value.trim(); if (!value) return;
-  const { field, column, floorField } = addModalState;
+  var value = document.getElementById('addModalInput').value.trim();
+  if (!value) return;
+  var field = addModalState.field, column = addModalState.column, floorField = addModalState.floorField;
   try {
     if (field === 'fromRoom' || field === 'toRoom') {
-      const floor = document.getElementById(floorField).value;
-      const result = await api('addRoomWithFloor', { spreadsheetId: currentUser.spreadsheetId, roomName: value, floor });
-      if (result.success) { if (!settings.rooms) settings.rooms = []; settings.rooms.push({ name: value, floor }); filterFromRooms(); filterToRooms(); document.getElementById(field).value = value; closeAddModal(); }
-    } else {
-      const result = await api('addSettingItem', { spreadsheetId: currentUser.spreadsheetId, column, value });
+      var floor = document.getElementById(floorField).value;
+      var result = await api('addRoomWithFloor', { spreadsheetId: currentUser.spreadsheetId, roomName: value, floor: floor });
       if (result.success) {
+        if (!settings.rooms) settings.rooms = [];
+        settings.rooms.push({ name: value, floor: floor });
+        filterFromRooms(); filterToRooms();
+        document.getElementById(field).value = value;
+        closeAddModal();
+      }
+    } else {
+      var result2 = await api('addSettingItem', { spreadsheetId: currentUser.spreadsheetId, column: column, value: value });
+      if (result2.success) {
         if (field === 'deviceType') { settings.deviceTypes.push(value); fillSelect('deviceType', settings.deviceTypes); document.getElementById('deviceType').value = value; }
         else if (field === 'department') { settings.departments.push(value); fillSelect('department', settings.departments); document.getElementById('department').value = value; }
         else if (field === 'toLocation') { settings.sites.push(value); fillSelect('fromLocation', settings.sites); fillSelect('toLocation', settings.sites); document.getElementById('toLocation').value = value; }
         closeAddModal();
       }
     }
-  } catch (e) { alert('حدث خطأ في الإضافة'); }
+  } catch(e) { alert('حدث خطأ في الإضافة'); }
 }
 
 function populateDeviceFloorFilter() {
-  const sel = document.getElementById('filterFloor');
+  var sel = document.getElementById('filterFloor');
   sel.innerHTML = '<option value="">كل الأدوار</option>';
-  (settings.floors || []).forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
+  (settings.floors || []).forEach(function(f) { var o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
 }
 function onFloorFilterChange() {
-  const floor = document.getElementById('filterFloor').value, roomSel = document.getElementById('filterRoom');
+  var floor = document.getElementById('filterFloor').value;
+  var roomSel = document.getElementById('filterRoom');
   roomSel.innerHTML = '<option value="">كل الغرف</option>';
-  (settings.rooms || []).filter(r => !floor || r.floor === floor).forEach(r => { const o = document.createElement('option'); o.value = r.name; o.textContent = r.name; roomSel.appendChild(o); });
+  (settings.rooms || []).filter(function(r) { return !floor || r.floor === floor; }).forEach(function(r) {
+    var o = document.createElement('option'); o.value = r.name; o.textContent = r.name; roomSel.appendChild(o);
+  });
   filterDevices();
 }
 function filterDevices() {
-  const search = document.getElementById('searchInput').value.trim().toLowerCase();
-  const floor = document.getElementById('filterFloor').value, room = document.getElementById('filterRoom').value;
-  renderDevices(allDevices.filter(d => (!search || (d.serial_number||'').toLowerCase().includes(search) || (d.asset_number||'').toString().toLowerCase().includes(search)) && (!floor || d.floor === floor) && (!room || d.room === room)));
+  var search = document.getElementById('searchInput').value.trim().toLowerCase();
+  var floor = document.getElementById('filterFloor').value;
+  var room = document.getElementById('filterRoom').value;
+  renderDevices(allDevices.filter(function(d) {
+    return (!search || (d.serial_number||'').toLowerCase().includes(search) || (d.asset_number||'').toString().toLowerCase().includes(search)) &&
+           (!floor || d.floor === floor) && (!room || d.room === room);
+  }));
 }
-function clearFilters() { document.getElementById('searchInput').value=''; document.getElementById('filterFloor').value=''; document.getElementById('filterRoom').innerHTML='<option value="">كل الغرف</option>'; renderDevices(allDevices); }
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterFloor').value = '';
+  document.getElementById('filterRoom').innerHTML = '<option value="">كل الغرف</option>';
+  renderDevices(allDevices);
+}
 
 function renderStats(devices) {
-  const types = {};
-  devices.forEach(d => { const t = d.device_type||'غير محدد'; types[t]=(types[t]||0)+1; });
+  var types = {};
+  devices.forEach(function(d) { var t = d.device_type||'غير محدد'; types[t]=(types[t]||0)+1; });
   document.getElementById('countBadge').textContent = devices.length + ' جهاز';
-  let html = `<div class="stat-pill"><span class="stat-num">${devices.length}</span><span>إجمالي</span></div>`;
-  Object.entries(types).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => { html += `<div class="stat-pill"><span class="stat-num">${c}</span><span>${t}</span></div>`; });
+  var html = '<div class="stat-pill"><span class="stat-num">' + devices.length + '</span><span>إجمالي</span></div>';
+  Object.entries(types).sort(function(a,b){return b[1]-a[1];}).forEach(function(entry) {
+    html += '<div class="stat-pill"><span class="stat-num">' + entry[1] + '</span><span>' + entry[0] + '</span></div>';
+  });
   document.getElementById('statsBar').innerHTML = html;
 }
 
 function renderDevices(devices) {
   renderStats(devices);
-  const empty = document.getElementById('devicesEmpty'), table = document.getElementById('devicesTable'), tbody = document.getElementById('devicesBody');
+  var empty = document.getElementById('devicesEmpty'), table = document.getElementById('devicesTable'), tbody = document.getElementById('devicesBody');
   if (!devices.length) { table.style.display='none'; empty.style.display='block'; return; }
   empty.style.display='none'; table.style.display='table'; tbody.innerHTML='';
-  devices.forEach((d,i) => {
-    const seat = [d.seat_number, d.seat_letter].filter(Boolean).join('');
-    const date = d.last_movement ? new Date(d.last_movement).toLocaleDateString('ar-EG') : '—';
-    const tr = document.createElement('tr'); tr.className='device-row'; tr.onclick=()=>openDeviceModal(d);
-    tr.innerHTML = `<td>${i+1}</td><td>${d.serial_number||'—'}</td><td>${d.asset_number||'—'}</td><td>${d.device_type||'—'}</td><td>${d.department||'—'}</td><td>${d.current_location||'—'}</td><td>${d.floor||'—'}</td><td>${d.room||'—'}</td><td>${seat?`<span class="seat-badge">${seat}</span>`:'—'}</td><td>${date}</td><td>${d.moved_by||'—'}</td>`;
+  devices.forEach(function(d, i) {
+    var seat = [d.seat_number, d.seat_letter].filter(Boolean).join('');
+    var date = d.last_movement ? new Date(d.last_movement).toLocaleDateString('ar-EG') : '—';
+    var tr = document.createElement('tr'); tr.className='device-row';
+    tr.onclick = function() { openDeviceModal(d); };
+    tr.innerHTML = '<td>'+(i+1)+'</td><td>'+(d.serial_number||'—')+'</td><td>'+(d.asset_number||'—')+'</td><td>'+(d.device_type||'—')+'</td><td>'+(d.department||'—')+'</td><td>'+(d.current_location||'—')+'</td><td>'+(d.floor||'—')+'</td><td>'+(d.room||'—')+'</td><td>'+(seat?'<span class="seat-badge">'+seat+'</span>':'—')+'</td><td>'+date+'</td><td>'+(d.moved_by||'—')+'</td>';
     tbody.appendChild(tr);
   });
 }
@@ -585,48 +641,51 @@ async function openDeviceModal(d) {
   document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">⏳ جاري التحميل...</div>';
   document.getElementById('deviceModal').classList.add('show');
   try {
-    const result = await api('getDeviceMovements', { spreadsheetId: currentUser.spreadsheetId, serial: d.serial_number, assetNumber: d.asset_number });
+    var result = await api('getDeviceMovements', { spreadsheetId: currentUser.spreadsheetId, serial: d.serial_number, assetNumber: d.asset_number });
     if (result.success && result.data && result.data.length) {
-      let html = '<table class="mov-table"><thead><tr><th>التاريخ</th><th>بواسطة</th><th>من</th><th>إلى</th></tr></thead><tbody>';
-      result.data.forEach(m => {
-        const from=[m.from_location,m.from_floor,m.from_room].filter(Boolean).join(' / ');
-        const to=[m.to_location,m.to_floor,m.to_room].filter(Boolean).join(' / ');
-        html += `<tr><td>${m.timestamp?new Date(m.timestamp).toLocaleString('ar-EG'):'—'}</td><td>${m.moved_by||'—'}</td><td>${from||'—'}</td><td>${to||'—'}</td></tr>`;
+      var html = '<table class="mov-table"><thead><tr><th>التاريخ</th><th>بواسطة</th><th>من</th><th>إلى</th></tr></thead><tbody>';
+      result.data.forEach(function(m) {
+        var from=[m.from_location,m.from_floor,m.from_room].filter(Boolean).join(' / ');
+        var to=[m.to_location,m.to_floor,m.to_room].filter(Boolean).join(' / ');
+        var date = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG') : '—';
+        html += '<tr><td>'+date+'</td><td>'+(m.moved_by||'—')+'</td><td>'+(from||'—')+'</td><td>'+(to||'—')+'</td></tr>';
       });
       html += '</tbody></table>';
       document.getElementById('movementsContainer').innerHTML = html;
     } else { document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">لا توجد تحركات مسجلة</div>'; }
-  } catch (e) { document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">حدث خطأ في التحميل</div>'; }
+  } catch(e) { document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">حدث خطأ في التحميل</div>'; }
 }
 function closeDeviceModal() { document.getElementById('deviceModal').classList.remove('show'); }
 
 function startScan(fieldId) {
   if (scannerActive) { stopScanner(); return; }
-  const overlay = document.createElement('div');
+  var overlay = document.createElement('div');
   overlay.id = 'scanOverlay';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
-  const readerDiv = document.createElement('div'); readerDiv.id='qr-reader'; readerDiv.style.cssText='width:300px;max-width:90%;border-radius:16px;overflow:hidden;';
-  const status = document.createElement('div'); status.id='qr-status'; status.style.cssText='color:white;font-size:14px;text-align:center;'; status.textContent='⏳ جاري تشغيل الكاميرا...';
-  const closeBtn = document.createElement('button'); closeBtn.textContent='✕ إغلاق'; closeBtn.style.cssText='padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;'; closeBtn.onclick=stopScanner;
+  var readerDiv = document.createElement('div'); readerDiv.id='qr-reader'; readerDiv.style.cssText='width:300px;max-width:90%;border-radius:16px;overflow:hidden;';
+  var status = document.createElement('div'); status.id='qr-status'; status.style.cssText='color:white;font-size:14px;text-align:center;'; status.textContent='⏳ جاري تشغيل الكاميرا...';
+  var closeBtn = document.createElement('button'); closeBtn.textContent='✕ إغلاق'; closeBtn.style.cssText='padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;'; closeBtn.onclick=stopScanner;
   overlay.appendChild(readerDiv); overlay.appendChild(status); overlay.appendChild(closeBtn);
   document.body.appendChild(overlay);
   try {
     html5QrCode = new Html5Qrcode('qr-reader');
-    html5QrCode.start({ facingMode:'environment' }, { fps:10, qrbox:{width:250,height:250} },
-      (decoded) => { document.getElementById(fieldId).value=decoded; if(fieldId==='serial') onSerialChange(); else onAssetChange(); stopScanner(); },
-      () => {}
-    ).then(() => { scannerActive=true; status.textContent='✅ ضع الباركود أمام الكاميرا'; })
-    .catch(() => { status.textContent='❌ فشل تشغيل الكاميرا — تأكد من منح الإذن'; setTimeout(stopScanner,2000); });
-  } catch (e) { alert('لا يمكن الوصول للكاميرا'); stopScanner(); }
+    html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      function(decoded) { document.getElementById(fieldId).value=decoded; if(fieldId==='serial') onSerialChange(); else onAssetChange(); stopScanner(); },
+      function() {}
+    ).then(function() { scannerActive=true; status.textContent='✅ ضع الباركود أمام الكاميرا'; })
+    .catch(function() { status.textContent='❌ فشل تشغيل الكاميرا — تأكد من منح الإذن'; setTimeout(stopScanner,2000); });
+  } catch(e) { alert('لا يمكن الوصول للكاميرا'); stopScanner(); }
 }
 function stopScanner() {
-  if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(()=>html5QrCode.clear()).catch(()=>{});
-  const o=document.getElementById('scanOverlay'); if(o) o.remove();
+  if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(function(){html5QrCode.clear();}).catch(function(){});
+  var o=document.getElementById('scanOverlay'); if(o) o.remove();
   scannerActive=false; html5QrCode=null;
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-  const saved = sessionStorage.getItem('ats_user');
+window.addEventListener('DOMContentLoaded', async function() {
+  var saved = sessionStorage.getItem('ats_user');
   if (saved) {
     try { currentUser=JSON.parse(saved); await loadSettingsAndShowHome(); return; } catch(e) { sessionStorage.removeItem('ats_user'); }
   }
