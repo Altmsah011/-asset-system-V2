@@ -3,25 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام تتبع الأصول</title>
+<title>نظام تتبع الأصول V2</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; min-height: 100vh; }
-  .login-card { max-width: 380px; margin: 40px auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
-  input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; font-size: 15px; }
-  input { border: 1px solid #ddd; }
-  button { background: #4f46e5; color: white; border: none; cursor: pointer; font-weight: bold; }
-  .error { color: #dc2626; text-align: center; margin: 10px 0; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin:0; padding:20px; }
+  .card { max-width: 400px; margin: 40px auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+  input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+  button { width: 100%; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+  .error { color: #dc2626; margin: 15px 0; }
+  .success { color: #16a34a; }
 </style>
 </head>
 <body>
 
-<div class="login-card">
-  <h1 style="text-align:center;margin-bottom:20px;">📦 نظام تتبع الأصول</h1>
+<div class="card">
+  <h1>📦 نظام تتبع الأصول</h1>
+  <p>V2 - Multi Site</p>
+  
   <input type="text" id="username" placeholder="اسم المستخدم" value="admin" />
   <input type="password" id="password" placeholder="كلمة المرور" value="admin" />
   <button onclick="doLogin()">دخول</button>
-  <div class="error" id="errorMsg"></div>
+  
+  <div id="errorMsg" class="error"></div>
+  <div id="status" style="margin-top:15px; font-size:14px;"></div>
 </div>
 
 <script>
@@ -31,35 +34,42 @@ async function doLogin() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
   const errorMsg = document.getElementById('errorMsg');
+  const status = document.getElementById('status');
 
   errorMsg.textContent = '';
-
-  if (!username || !password) {
-    errorMsg.textContent = "يرجى إدخال اسم المستخدم وكلمة المرور";
-    return;
-  }
+  status.textContent = 'جاري الاتصال...';
 
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'login', username, password })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "login",
+        username: username,
+        password: password
+      })
     });
 
     const result = await response.json();
+    console.log("Response from server:", result);
 
     if (result.success) {
-      alert("✅ تم تسجيل الدخول بنجاح!\n\n" + result.user.fullName);
-      console.log("User:", result.user);
-      // هنا هننتقل للصفحة الرئيسية لاحقاً
+      status.innerHTML = `<span class="success">✅ تم الدخول بنجاح!<br>${result.user.fullName}</span>`;
+      console.log("User Data:", result.user);
     } else {
-      errorMsg.textContent = result.message || "بيانات دخول غير صحيحة";
+      errorMsg.textContent = result.message || "بيانات الدخول غير صحيحة";
     }
   } catch (err) {
-    console.error(err);
-    errorMsg.textContent = "حدث خطأ في الاتصال بالسيرفر";
+    console.error("Error:", err);
+    errorMsg.textContent = "حدث خطأ في الاتصال - تأكد من الـ URL";
+    status.textContent = '';
   }
 }
+
+// اضغط Enter في الباسورد يسجل دخول
+document.getElementById('password').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
 </script>
 </body>
 </html>
