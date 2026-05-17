@@ -6,691 +6,180 @@
 <title>نظام تتبع الأصول</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #ede9fe;
-  --success: #22c55e; --danger: #dc2626; --bg: #f0f2f5; --white: #ffffff;
-  --border: #e0e0e0; --text: #1a1a2e; --text-light: #666; --text-muted: #888;
-  --shadow: 0 2px 8px rgba(0,0,0,0.06); --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
-  --radius: 12px; --radius-lg: 16px;
-}
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); }
-.page { display: none; }
-.page.active { display: block; }
-#loginPage.active { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-.login-card { background: var(--white); border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 380px; box-shadow: var(--shadow-lg); }
-.logo { text-align: center; margin-bottom: 1.5rem; }
-.logo-icon { font-size: 52px; display: block; margin-bottom: 8px; }
-.logo h1 { font-size: 20px; color: var(--text); }
-.logo p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-.form-group { margin-bottom: 1rem; }
-.form-group label { font-size: 13px; color: var(--text-light); display: block; margin-bottom: 6px; }
-.form-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
-.form-group input:focus { border-color: var(--primary); }
-.btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: .5rem; font-family: inherit; }
-.btn-primary:hover { background: var(--primary-dark); }
-.btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
-.alert-error { background: #fef2f2; color: var(--danger); padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 1rem; text-align: center; display: none; }
-.alert-success { background: #f0fdf4; color: #16a34a; padding: 12px; border-radius: 8px; font-size: 14px; text-align: center; display: none; margin-top: 1rem; }
-.navbar { background: var(--white); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 50; }
-.navbar-left { display: flex; align-items: center; gap: 12px; }
-.back-btn { background: #f3f4f6; border: none; border-radius: 8px; padding: 6px 12px; color: var(--primary); font-weight: bold; cursor: pointer; font-size: 14px; font-family: inherit; }
-.navbar h2 { font-size: 16px; color: var(--text); }
-.navbar-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-muted); }
-.logout-btn { font-size: 12px; color: var(--danger); cursor: pointer; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 6px; background: #fef2f2; }
-.location-badge { background: var(--primary-light); color: #5b21b6; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
-.home-content { padding: 2rem 1.5rem; max-width: 600px; margin: 0 auto; }
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
-.menu-card { background: var(--white); border-radius: var(--radius-lg); padding: 2rem 1rem; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; box-shadow: var(--shadow); }
-.menu-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-.menu-card .card-icon { font-size: 40px; margin-bottom: .75rem; display: block; }
-.menu-card h3 { font-size: 15px; color: var(--text); }
-.menu-card p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-.page-content { padding: 1.5rem; max-width: 600px; margin: 0 auto; }
-.section { background: var(--white); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
-.section-title { font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 2px solid var(--primary-light); }
-.form-row { margin-bottom: .875rem; }
-.form-row label { font-size: 12px; color: var(--text-light); display: block; margin-bottom: 5px; }
-.input-wrap { position: relative; display: flex; align-items: center; }
-.input-wrap input, .input-wrap select, .form-row select, .form-row input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; background: var(--white); font-family: inherit; }
-.input-wrap input:focus, .input-wrap select:focus, .form-row select:focus, .form-row input:focus { border-color: var(--primary); }
-.scan-btn { position: absolute; left: 8px; background: none; border: none; cursor: pointer; font-size: 20px; padding: 4px; }
-.add-btn { background: var(--success); color: white; border: none; border-radius: 6px; padding: 6px 10px; font-size: 18px; cursor: pointer; margin-right: 6px; flex-shrink: 0; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-.auto-badge { font-size: 11px; background: var(--primary-light); color: #5b21b6; padding: 2px 8px; border-radius: 10px; margin-right: 6px; }
-.submit-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 16px; cursor: pointer; margin-top: .5rem; font-family: inherit; }
-.submit-btn:hover { background: var(--primary-dark); }
-.submit-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
-.devices-content { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
-.search-bar { background: var(--white); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.search-bar input, .search-bar select { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; background: var(--white); }
-.search-bar input { flex: 1; min-width: 180px; }
-.clear-btn { padding: 8px 16px; background: #f3f4f6; color: var(--text-light); border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; }
-.count-badge { font-size: 12px; color: var(--text-muted); padding: 4px 10px; background: #f3f4f6; border-radius: 20px; }
-.stats-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-.stat-pill { background: var(--white); border-radius: 20px; padding: 6px 14px; font-size: 12px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 6px; }
-.stat-num { font-size: 15px; font-weight: 600; color: var(--primary); }
-.table-wrap { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: right; padding: 10px 12px; background: #f8f9fa; color: var(--text-light); font-weight: 500; border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
-.seat-badge { display: inline-block; background: var(--primary-light); color: #5b21b6; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
-.empty-state { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 14px; }
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
-.modal.show { display: flex; }
-.modal-card { background: var(--white); border-radius: var(--radius-lg); padding: 1.5rem; width: 90%; max-width: 340px; }
-.modal-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
-.modal-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 1rem; font-family: inherit; }
-.modal-input:focus { border-color: var(--primary); }
-.modal-btns { display: flex; gap: 8px; }
-.modal-ok { background: var(--primary); color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; flex: 1; font-family: inherit; }
-.modal-cancel { background: #f3f4f6; color: var(--text-light); padding: 10px; border: none; border-radius: 8px; cursor: pointer; flex: 1; font-family: inherit; }
-.device-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
-.device-modal.show { display: flex; }
-.device-modal-card { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 560px; overflow: hidden; margin: auto; }
-.device-modal-header { background: var(--primary); color: white; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-.device-modal-header h3 { font-size: 16px; }
-.device-modal-close { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-.device-modal-body { padding: 1.5rem; max-height: 75vh; overflow-y: auto; }
-.detail-section { margin-bottom: 1.25rem; }
-.detail-section-title { font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--primary-light); }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.detail-item { background: #f8f9fa; border-radius: 8px; padding: 8px 12px; }
-.detail-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
-.detail-value { font-size: 13px; color: var(--text); font-weight: 500; word-break: break-all; }
-.mov-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-.mov-table th { text-align: right; padding: 6px 8px; background: #f8f9fa; color: var(--text-light); border-bottom: 1px solid var(--border); }
-.mov-table td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
-.mov-table tr:last-child td { border-bottom: none; }
-.no-mov { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 13px; }
-.loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 300; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
-.loading-overlay.show { display: flex; }
-.spinner { width: 40px; height: 40px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 14px; color: var(--text-light); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; min-height: 100vh; }
+  .page { display: none; }
+  .active { display: block; }
+  
+  .login-card { max-width: 380px; margin: 50px auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+  .logo { text-align: center; margin-bottom: 1.5rem; font-size: 48px; }
+  input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px; font-size: 15px; }
+  .btn { width: 100%; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+  .btn:disabled { background: #a5b4fc; }
+  .error { color: #dc2626; text-align: center; margin: 10px 0; }
+
+  .navbar { background: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .content { padding: 1.5rem; max-width: 800px; margin: 0 auto; }
+  .section { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">جاري التحميل...</div>
-</div>
-
-<div class="page" id="loginPage">
+<!-- Login Page -->
+<div id="loginPage" class="page active">
   <div class="login-card">
-    <div class="logo">
-      <span class="logo-icon">📦</span>
-      <h1>نظام تتبع الأصول</h1>
-      <p>سجّل دخولك للمتابعة</p>
-    </div>
-    <div class="form-group">
-      <label>اسم المستخدم</label>
-      <input type="text" id="username" placeholder="اكتب اسم المستخدم" autocomplete="username">
-    </div>
-    <div class="form-group">
-      <label>كلمة المرور</label>
-      <input type="password" id="password" placeholder="اكتب كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn-primary" id="loginBtn" onclick="doLogin()">دخول</button>
-    <div class="alert-error" id="loginError"></div>
+    <div class="logo">📦</div>
+    <h1 style="text-align:center;margin-bottom:8px;">نظام تتبع الأصول</h1>
+    <p style="text-align:center;color:#666;margin-bottom:20px;">V2 - Multi Site</p>
+    
+    <input type="text" id="username" placeholder="اسم المستخدم" />
+    <input type="password" id="password" placeholder="كلمة المرور" />
+    <button class="btn" onclick="doLogin()">دخول</button>
+    <div class="error" id="loginError"></div>
   </div>
 </div>
 
-<div class="page" id="homePage">
+<!-- Main Page -->
+<div id="mainPage" class="page">
   <div class="navbar">
-    <div class="navbar-left"><h2>📦 نظام تتبع الأصول</h2></div>
-    <div class="navbar-right">
-      <span class="location-badge">📍 <span id="homeLocation"></span></span>
-      <span id="homeUsername"></span>
-      <span class="logout-btn" onclick="doLogout()">خروج</span>
+    <h2>📦 نظام تتبع الأصول</h2>
+    <div>
+      <span id="userInfo" style="margin-left:15px;"></span>
+      <button onclick="logout()" style="margin-right:10px;background:#fee2e2;color:#dc2626;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">خروج</button>
     </div>
   </div>
-  <div class="home-content">
-    <div class="menu-grid">
-      <div class="menu-card" onclick="showMovementPage()">
-        <span class="card-icon">🔄</span>
+  <div class="content">
+    <div style="background:#f0abfc;color:#6b21a8;padding:10px 16px;border-radius:9999px;display:inline-block;margin-bottom:20px;" id="locationBadge"></div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div onclick="showPage('movement')" style="background:white;padding:2rem;text-align:center;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:48px;margin-bottom:12px;">🔄</div>
         <h3>تسجيل حركة نقل</h3>
-        <p>نقل جهاز من موقع لآخر</p>
       </div>
-      <div class="menu-card" onclick="showDevicesPage()">
-        <span class="card-icon">🖥️</span>
+      <div onclick="showPage('devices')" style="background:white;padding:2rem;text-align:center;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:48px;margin-bottom:12px;">🖥️</div>
         <h3>عرض الأجهزة</h3>
-        <p>كل الأجهزة المسجلة</p>
       </div>
     </div>
   </div>
 </div>
 
-<div class="page" id="movementPage">
+<!-- Movement Page -->
+<div id="movementPage" class="page">
+  <!-- سنضيف محتوى صفحة الحركة كاملة بعد التأكيد -->
   <div class="navbar">
-    <div class="navbar-left">
-      <button class="back-btn" onclick="showPage('homePage')">→ رجوع</button>
-      <h2>تسجيل حركة نقل</h2>
-    </div>
-    <div class="navbar-right">
-      <span class="location-badge">📍 <span id="movLocation"></span></span>
-    </div>
+    <button onclick="showPage('main')" style="background:none;border:none;font-size:20px;cursor:pointer;">←</button>
+    <h2>تسجيل حركة نقل</h2>
   </div>
-  <div class="page-content">
-    <div class="section">
-      <div class="section-title">📋 بيانات الجهاز</div>
-      <div class="form-row"><label>Serial Number</label>
-        <div class="input-wrap">
-          <input type="text" id="serial" placeholder="اكتب أو امسح" oninput="onSerialInput()" onchange="onSerialChange()">
-          <button class="scan-btn" onclick="startScan('serial')">📷</button>
-        </div>
-      </div>
-      <div class="form-row"><label>رقم الأصل</label>
-        <div class="input-wrap">
-          <input type="text" id="assetNumber" placeholder="اكتب أو امسح" oninput="onAssetInput()" onchange="onAssetChange()">
-          <button class="scan-btn" onclick="startScan('assetNumber')">📷</button>
-        </div>
-      </div>
-      <div class="form-row"><label>نوع الجهاز</label>
-        <div class="input-wrap">
-          <select id="deviceType"><option value="">-- اختر --</option></select>
-          <button class="add-btn" onclick="openAddModal('deviceType',1)">+</button>
-        </div>
-      </div>
-      <div class="form-row"><label>الإدارة</label>
-        <div class="input-wrap">
-          <select id="department"><option value="">-- اختر --</option></select>
-          <button class="add-btn" onclick="openAddModal('department',2)">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-title">📍 من الموقع القديم <span class="auto-badge">اختياري</span></div>
-      <div class="form-row"><label>الموقع</label><select id="fromLocation"><option value="">-- اختر --</option></select></div>
-      <div class="form-row"><label>الدور</label><select id="fromFloor" onchange="filterFromRooms()"><option value="">-- اختر --</option></select></div>
-      <div class="form-row"><label>الصالة / الغرفة</label>
-        <div class="input-wrap">
-          <select id="fromRoom"><option value="">-- اختر --</option></select>
-          <button class="add-btn" onclick="openAddModal('fromRoom',4,'fromFloor')">+</button>
-        </div>
-      </div>
-      <div class="grid2">
-        <div class="form-row"><label>رقم Seat</label><select id="fromSeatNum"><option value="">--</option></select></div>
-        <div class="form-row"><label>حرف Seat</label><select id="fromSeatLetter"><option value="">--</option></select></div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-title">🚀 إلى الموقع الجديد</div>
-      <div class="form-row"><label>الموقع</label>
-        <div class="input-wrap">
-          <select id="toLocation"><option value="">-- اختر --</option></select>
-          <button class="add-btn" onclick="openAddModal('toLocation',6)">+</button>
-        </div>
-      </div>
-      <div class="form-row"><label>الدور</label><select id="toFloor" onchange="filterToRooms()"><option value="">-- اختر --</option></select></div>
-      <div class="form-row"><label>الصالة / الغرفة</label>
-        <div class="input-wrap">
-          <select id="toRoom"><option value="">-- اختر --</option></select>
-          <button class="add-btn" onclick="openAddModal('toRoom',4,'toFloor')">+</button>
-        </div>
-      </div>
-      <div class="grid2">
-        <div class="form-row"><label>رقم Seat</label><select id="toSeatNum"><option value="">--</option></select></div>
-        <div class="form-row"><label>حرف Seat</label><select id="toSeatLetter"><option value="">--</option></select></div>
-      </div>
-      <div class="form-row"><label>رقم التيكت (اختياري)</label><input type="text" id="ticketNumber" placeholder="TK-2025-001"></div>
-      <div class="form-row"><label>ملاحظات (اختياري)</label><input type="text" id="notes" placeholder="أي ملاحظات إضافية"></div>
-    </div>
-    <button class="submit-btn" id="submitBtn" onclick="submitMovement()">✅ تسجيل الحركة</button>
-    <div class="alert-success" id="movSuccess">✅ تم تسجيل الحركة بنجاح!</div>
-    <div class="alert-error" id="movError"></div>
+  <div class="content" id="movementContent">
+    <!-- سيتم ملؤها ديناميكياً -->
+    <p>جاري تحميل صفحة الحركة...</p>
   </div>
 </div>
 
-<div class="page" id="devicesPage">
+<!-- Devices Page -->
+<div id="devicesPage" class="page">
   <div class="navbar">
-    <div class="navbar-left">
-      <button class="back-btn" onclick="showPage('homePage')">→ رجوع</button>
-      <h2>🖥️ عرض الأجهزة</h2>
-    </div>
-    <div class="navbar-right">
-      <span class="count-badge" id="countBadge">0 جهاز</span>
-    </div>
+    <button onclick="showPage('main')" style="background:none;border:none;font-size:20px;cursor:pointer;">←</button>
+    <h2>عرض الأجهزة</h2>
   </div>
-  <div class="devices-content">
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="🔍 ابحث بـ Serial أو رقم الأصل..." oninput="filterDevices()">
-      <select id="filterFloor" onchange="onFloorFilterChange()"><option value="">كل الأدوار</option></select>
-      <select id="filterRoom" onchange="filterDevices()"><option value="">كل الغرف</option></select>
-      <button class="clear-btn" onclick="clearFilters()">مسح</button>
-    </div>
-    <div class="stats-bar" id="statsBar"></div>
-    <div class="table-wrap">
-      <div class="empty-state" id="devicesEmpty" style="display:none">لا توجد أجهزة</div>
-      <table id="devicesTable" style="display:none">
-        <thead><tr>
-          <th>#</th><th>Serial</th><th>رقم الأصل</th><th>النوع</th>
-          <th>الإدارة</th><th>الموقع</th><th>الدور</th><th>الغرفة</th>
-          <th>Seat</th><th>آخر تحرك</th><th>بواسطة</th>
-        </tr></thead>
-        <tbody id="devicesBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="addModal">
-  <div class="modal-card">
-    <div class="modal-title" id="addModalTitle">إضافة جديد</div>
-    <input type="text" class="modal-input" id="addModalInput" placeholder="اكتب القيمة الجديدة">
-    <div class="modal-btns">
-      <button class="modal-ok" onclick="confirmAdd()">إضافة</button>
-      <button class="modal-cancel" onclick="closeAddModal()">إلغاء</button>
-    </div>
-  </div>
-</div>
-
-<div class="device-modal" id="deviceModal">
-  <div class="device-modal-card">
-    <div class="device-modal-header">
-      <h3 id="deviceModalTitle">تفاصيل الجهاز</h3>
-      <button class="device-modal-close" onclick="closeDeviceModal()">✕</button>
-    </div>
-    <div class="device-modal-body">
-      <div class="detail-section">
-        <div class="detail-section-title">📋 بيانات الجهاز</div>
-        <div class="detail-grid">
-          <div class="detail-item"><div class="detail-label">Serial</div><div class="detail-value" id="d-serial">—</div></div>
-          <div class="detail-item"><div class="detail-label">رقم الأصل</div><div class="detail-value" id="d-asset">—</div></div>
-          <div class="detail-item"><div class="detail-label">النوع</div><div class="detail-value" id="d-type">—</div></div>
-          <div class="detail-item"><div class="detail-label">الإدارة</div><div class="detail-value" id="d-dept">—</div></div>
-          <div class="detail-item"><div class="detail-label">الموقع</div><div class="detail-value" id="d-location">—</div></div>
-          <div class="detail-item"><div class="detail-label">الدور</div><div class="detail-value" id="d-floor">—</div></div>
-          <div class="detail-item"><div class="detail-label">الغرفة</div><div class="detail-value" id="d-room">—</div></div>
-          <div class="detail-item"><div class="detail-label">Seat</div><div class="detail-value" id="d-seat">—</div></div>
-          <div class="detail-item"><div class="detail-label">آخر تحرك</div><div class="detail-value" id="d-lastmove">—</div></div>
-          <div class="detail-item"><div class="detail-label">بواسطة</div><div class="detail-value" id="d-movedby">—</div></div>
-        </div>
-      </div>
-      <div class="detail-section">
-        <div class="detail-section-title">📦 سجل التحركات</div>
-        <div id="movementsContainer"><div class="no-mov">⏳ جاري التحميل...</div></div>
-      </div>
-    </div>
+  <div class="content" id="devicesContent">
+    <p>جاري تحميل الأجهزة...</p>
   </div>
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbxB6vxFZEBW2Re20LmDk4dJeHjqbTiUMmq2jpZImVbx7wKTaZprdqDR1hoS-oJksChA/exec';
+// ==================== CONFIG ====================
+const API_URL = "https://script.google.com/macros/s/AKfycbxe6wbuqxp_5XbipgBdxYlR8c-NoRgUV7h15Ld7WRwjYgHZA7Ed_gyfckdu4XMRAmMT/exec";
 
-let currentUser = null, settings = {}, allDevices = [];
-let addModalState = { field: null, column: null, floorField: null };
-let lookupTimeout = null, lastSerial = '', lastAsset = '', autoFilled = false;
-let html5QrCode = null, scannerActive = false;
+let currentUser = null;
 
-function api(action, params) {
-  params = params || {};
-  return new Promise(function(resolve, reject) {
-    var cbName = 'cb_' + Math.random().toString(36).slice(2);
-    var dataStr = encodeURIComponent(JSON.stringify(params));
-    var url = API_URL + '?callback=' + encodeURIComponent(cbName) + '&action=' + encodeURIComponent(action) + '&data=' + dataStr;
-    window[cbName] = function(result) {
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      resolve(result);
+// ==================== API Call (JSONP) ====================
+async function api(action, params = {}) {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_callback_' + Math.random().toString(36).substring(2);
+    const dataStr = encodeURIComponent(JSON.stringify(params));
+    const url = `${API_URL}?callback=${callbackName}&action=${action}&data=${dataStr}`;
+
+    window[callbackName] = function(response) {
+      delete window[callbackName];
+      resolve(response);
     };
-    var script = document.createElement('script');
+
+    const script = document.createElement('script');
     script.src = url;
-    script.onerror = function() {
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      reject(new Error('خطأ في الاتصال'));
+    script.onerror = () => {
+      delete window[callbackName];
+      reject(new Error("فشل الاتصال بالسيرفر"));
     };
     document.head.appendChild(script);
-    setTimeout(function() {
-      if (window[cbName]) {
-        delete window[cbName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error('انتهت مهلة الاتصال'));
+
+    setTimeout(() => {
+      if (window[callbackName]) {
+        delete window[callbackName];
+        reject(new Error("انتهت مهلة الطلب"));
       }
-    }, 30000);
+    }, 25000);
   });
 }
 
-function showLoading(text) {
-  document.getElementById('loadingText').textContent = text || 'جاري التحميل...';
-  document.getElementById('loadingOverlay').classList.add('show');
-}
-function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-}
-
+// ==================== Login ====================
 async function doLogin() {
-  var username = document.getElementById('username').value.trim();
-  var password = document.getElementById('password').value.trim();
-  if (!username || !password) { showLoginError('من فضلك اكتب اسم المستخدم وكلمة المرور'); return; }
-  var btn = document.getElementById('loginBtn');
-  btn.disabled = true; btn.textContent = 'جاري التحقق...';
-  document.getElementById('loginError').style.display = 'none';
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errorEl = document.getElementById('loginError');
+
+  if (!username || !password) {
+    errorEl.textContent = "يرجى إدخال اسم المستخدم وكلمة المرور";
+    errorEl.style.display = 'block';
+    return;
+  }
+
   try {
-    showLoading('جاري التحقق...');
-    var result = await api('login', { username: username, password: password });
-    hideLoading(); btn.disabled = false; btn.textContent = 'دخول';
+    const result = await api('login', { username, password });
     if (result.success) {
       currentUser = result.user;
-      sessionStorage.setItem('ats_user', JSON.stringify(currentUser));
-      await loadSettingsAndShowHome();
-    } else { showLoginError(result.message || 'اسم المستخدم أو الباسورد غلط'); }
-  } catch(e) { hideLoading(); btn.disabled = false; btn.textContent = 'دخول'; showLoginError('حدث خطأ في الاتصال، حاول تاني'); }
-}
-
-function showLoginError(msg) { var el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
-
-async function loadSettingsAndShowHome() {
-  showLoading('جاري تحميل البيانات...');
-  try { var r = await api('getSettings', { spreadsheetId: currentUser.spreadsheetId }); if (r.success) settings = r.data || {}; } catch(e) { settings = {}; }
-  hideLoading();
-  document.getElementById('homeLocation').textContent = currentUser.locationName;
-  document.getElementById('homeUsername').textContent = currentUser.fullName;
-  showPage('homePage');
-}
-
-function doLogout() {
-  currentUser = null; settings = {}; allDevices = [];
-  sessionStorage.removeItem('ats_user');
-  showPage('loginPage');
-}
-
-function showMovementPage() {
-  document.getElementById('movLocation').textContent = currentUser.locationName;
-  populateMovementSelects(); resetMovementForm(); showPage('movementPage');
-}
-
-async function showDevicesPage() {
-  showPage('devicesPage'); showLoading('جاري تحميل الأجهزة...');
-  try { var r = await api('getDevices', { spreadsheetId: currentUser.spreadsheetId }); allDevices = r.success ? (r.data || []) : []; } catch(e) { allDevices = []; }
-  hideLoading(); populateDeviceFloorFilter(); renderDevices(allDevices);
-}
-
-function populateMovementSelects() {
-  fillSelect('deviceType', settings.deviceTypes); fillSelect('department', settings.departments);
-  fillSelect('fromLocation', settings.sites); fillSelect('toLocation', settings.sites);
-  fillFloors('fromFloor', settings.floors); fillFloors('toFloor', settings.floors); fillSeats();
-}
-
-function fillSelect(id, items) {
-  var sel = document.getElementById(id), val = sel.value;
-  sel.innerHTML = '<option value="">-- اختر --</option>';
-  (items || []).forEach(function(i) { var o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o); });
-  if (val) sel.value = val;
-}
-
-function fillFloors(id, floors) {
-  var sel = document.getElementById(id);
-  sel.innerHTML = '<option value="">-- اختر --</option>';
-  (floors || []).forEach(function(f) { var o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
-}
-
-function filterFromRooms() { filterRooms('fromRoom', document.getElementById('fromFloor').value); }
-function filterToRooms() { filterRooms('toRoom', document.getElementById('toFloor').value); }
-function filterRooms(id, floor) {
-  var sel = document.getElementById(id);
-  sel.innerHTML = '<option value="">-- اختر --</option>';
-  (settings.rooms || []).filter(function(r) { return !floor || r.floor === floor; }).forEach(function(r) {
-    var o = document.createElement('option'); o.value = r.name; o.textContent = r.name; sel.appendChild(o);
-  });
-}
-
-function fillSeats() {
-  ['fromSeatNum','toSeatNum'].forEach(function(id) {
-    var s = document.getElementById(id); s.innerHTML = '<option value="">--</option>';
-    for (var i=1; i<=25; i++) { var o=document.createElement('option'); o.value=i; o.textContent=i; s.appendChild(o); }
-  });
-  ['fromSeatLetter','toSeatLetter'].forEach(function(id) {
-    var s = document.getElementById(id); s.innerHTML = '<option value="">--</option>';
-    for (var c=65; c<=90; c++) { var o=document.createElement('option'); o.value=String.fromCharCode(c); o.textContent=String.fromCharCode(c); s.appendChild(o); }
-  });
-}
-
-function onSerialInput() { if (!document.getElementById('serial').value.trim() && autoFilled) clearAutoFilled(); }
-function onSerialChange() { if (document.getElementById('serial').value.trim()) triggerLookup(); else if (autoFilled) clearAutoFilled(); }
-function onAssetInput() { if (!document.getElementById('assetNumber').value.trim() && autoFilled) clearAutoFilled(); }
-function onAssetChange() { if (document.getElementById('assetNumber').value.trim()) triggerLookup(); else if (autoFilled) clearAutoFilled(); }
-
-function triggerLookup() {
-  var serial = document.getElementById('serial').value.trim();
-  var asset = document.getElementById('assetNumber').value.trim();
-  if (!serial && !asset) return;
-  if (serial === lastSerial && asset === lastAsset) return;
-  clearTimeout(lookupTimeout);
-  lookupTimeout = setTimeout(async function() {
-    lastSerial = serial; lastAsset = asset;
-    try {
-      var result = await api('lookupDevice', { spreadsheetId: currentUser.spreadsheetId, serial: serial, assetNumber: asset });
-      if (result.success && result.device) {
-        autoFilled = true; var d = result.device;
-        if (d.serial) document.getElementById('serial').value = d.serial;
-        if (d.assetNumber) document.getElementById('assetNumber').value = d.assetNumber;
-        if (d.deviceType) document.getElementById('deviceType').value = d.deviceType;
-        if (d.department) document.getElementById('department').value = d.department;
-        if (d.currentLocation) document.getElementById('fromLocation').value = d.currentLocation;
-        if (d.floor) { document.getElementById('fromFloor').value = d.floor; filterFromRooms(); setTimeout(function() { if (d.room) document.getElementById('fromRoom').value = d.room; }, 100); }
-        if (d.seatNumber) document.getElementById('fromSeatNum').value = d.seatNumber;
-        if (d.seatLetter) document.getElementById('fromSeatLetter').value = d.seatLetter;
-      }
-    } catch(e) {}
-  }, 600);
-}
-
-function clearAutoFilled() {
-  autoFilled = false; lastSerial = ''; lastAsset = '';
-  ['assetNumber','deviceType','department','fromLocation','fromFloor','fromRoom','fromSeatNum','fromSeatLetter'].forEach(function(id) { document.getElementById(id).value = ''; });
-}
-
-async function submitMovement() {
-  var serial = document.getElementById('serial').value.trim();
-  var asset = document.getElementById('assetNumber').value.trim();
-  if (!serial && !asset) { showMovError('لازم تكتب Serial Number أو رقم الأصل'); return; }
-  if (!document.getElementById('toLocation').value) { showMovError('لازم تختار الموقع الجديد'); return; }
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = 'جاري الحفظ...';
-  document.getElementById('movError').style.display = 'none';
-  var movementData = {
-    serial: serial, assetNumber: asset,
-    deviceType: document.getElementById('deviceType').value,
-    department: document.getElementById('department').value,
-    fromLocation: document.getElementById('fromLocation').value,
-    fromFloor: document.getElementById('fromFloor').value,
-    fromRoom: document.getElementById('fromRoom').value,
-    fromSeatNum: document.getElementById('fromSeatNum').value,
-    fromSeatLetter: document.getElementById('fromSeatLetter').value,
-    toLocation: document.getElementById('toLocation').value,
-    toFloor: document.getElementById('toFloor').value,
-    toRoom: document.getElementById('toRoom').value,
-    toSeatNum: document.getElementById('toSeatNum').value,
-    toSeatLetter: document.getElementById('toSeatLetter').value,
-    ticketNumber: document.getElementById('ticketNumber').value,
-    notes: document.getElementById('notes').value
-  };
-  try {
-    var result = await api('saveMovement', {
-      spreadsheetId: currentUser.spreadsheetId,
-      locationName: currentUser.locationName,
-      movementData: movementData,
-      userFullName: currentUser.fullName
-    });
-    btn.disabled = false; btn.textContent = '✅ تسجيل الحركة';
-    if (result.success) {
-      var s = document.getElementById('movSuccess'); s.style.display = 'block';
-      autoFilled = false; lastSerial = ''; lastAsset = '';
-      setTimeout(function() { s.style.display = 'none'; resetMovementForm(); }, 2000);
-    } else { showMovError(result.message || 'حدث خطأ'); }
-  } catch(e) { btn.disabled = false; btn.textContent = '✅ تسجيل الحركة'; showMovError('حدث خطأ في الاتصال'); }
-}
-
-function showMovError(msg) { var e = document.getElementById('movError'); e.textContent = msg; e.style.display = 'block'; }
-function resetMovementForm() {
-  ['serial','assetNumber','ticketNumber','notes'].forEach(function(id) { document.getElementById(id).value = ''; });
-  ['deviceType','department','fromLocation','fromFloor','fromRoom','fromSeatNum','fromSeatLetter','toLocation','toFloor','toRoom','toSeatNum','toSeatLetter'].forEach(function(id) { document.getElementById(id).value = ''; });
-}
-
-function openAddModal(field, column, floorField) {
-  addModalState = { field: field, column: column, floorField: floorField || null };
-  var titles = { deviceType:'إضافة نوع جهاز', department:'إضافة إدارة', fromRoom:'إضافة صالة/غرفة', toRoom:'إضافة صالة/غرفة', toLocation:'إضافة موقع' };
-  document.getElementById('addModalTitle').textContent = titles[field] || 'إضافة جديد';
-  document.getElementById('addModalInput').value = '';
-  document.getElementById('addModal').classList.add('show');
-}
-function closeAddModal() { document.getElementById('addModal').classList.remove('show'); }
-
-async function confirmAdd() {
-  var value = document.getElementById('addModalInput').value.trim();
-  if (!value) return;
-  var field = addModalState.field, column = addModalState.column, floorField = addModalState.floorField;
-  try {
-    if (field === 'fromRoom' || field === 'toRoom') {
-      var floor = document.getElementById(floorField).value;
-      var result = await api('addRoomWithFloor', { spreadsheetId: currentUser.spreadsheetId, roomName: value, floor: floor });
-      if (result.success) {
-        if (!settings.rooms) settings.rooms = [];
-        settings.rooms.push({ name: value, floor: floor });
-        filterFromRooms(); filterToRooms();
-        document.getElementById(field).value = value;
-        closeAddModal();
-      }
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showMainPage();
     } else {
-      var result2 = await api('addSettingItem', { spreadsheetId: currentUser.spreadsheetId, column: column, value: value });
-      if (result2.success) {
-        if (field === 'deviceType') { settings.deviceTypes.push(value); fillSelect('deviceType', settings.deviceTypes); document.getElementById('deviceType').value = value; }
-        else if (field === 'department') { settings.departments.push(value); fillSelect('department', settings.departments); document.getElementById('department').value = value; }
-        else if (field === 'toLocation') { settings.sites.push(value); fillSelect('fromLocation', settings.sites); fillSelect('toLocation', settings.sites); document.getElementById('toLocation').value = value; }
-        closeAddModal();
-      }
+      errorEl.textContent = result.message || "بيانات الدخول غير صحيحة";
+      errorEl.style.display = 'block';
     }
-  } catch(e) { alert('حدث خطأ في الإضافة'); }
-}
-
-function populateDeviceFloorFilter() {
-  var sel = document.getElementById('filterFloor');
-  sel.innerHTML = '<option value="">كل الأدوار</option>';
-  (settings.floors || []).forEach(function(f) { var o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
-}
-function onFloorFilterChange() {
-  var floor = document.getElementById('filterFloor').value;
-  var roomSel = document.getElementById('filterRoom');
-  roomSel.innerHTML = '<option value="">كل الغرف</option>';
-  (settings.rooms || []).filter(function(r) { return !floor || r.floor === floor; }).forEach(function(r) {
-    var o = document.createElement('option'); o.value = r.name; o.textContent = r.name; roomSel.appendChild(o);
-  });
-  filterDevices();
-}
-function filterDevices() {
-  var search = document.getElementById('searchInput').value.trim().toLowerCase();
-  var floor = document.getElementById('filterFloor').value;
-  var room = document.getElementById('filterRoom').value;
-  renderDevices(allDevices.filter(function(d) {
-    return (!search || (d.serial_number||'').toLowerCase().includes(search) || (d.asset_number||'').toString().toLowerCase().includes(search)) &&
-           (!floor || d.floor === floor) && (!room || d.room === room);
-  }));
-}
-function clearFilters() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('filterFloor').value = '';
-  document.getElementById('filterRoom').innerHTML = '<option value="">كل الغرف</option>';
-  renderDevices(allDevices);
-}
-
-function renderStats(devices) {
-  var types = {};
-  devices.forEach(function(d) { var t = d.device_type||'غير محدد'; types[t]=(types[t]||0)+1; });
-  document.getElementById('countBadge').textContent = devices.length + ' جهاز';
-  var html = '<div class="stat-pill"><span class="stat-num">' + devices.length + '</span><span>إجمالي</span></div>';
-  Object.entries(types).sort(function(a,b){return b[1]-a[1];}).forEach(function(entry) {
-    html += '<div class="stat-pill"><span class="stat-num">' + entry[1] + '</span><span>' + entry[0] + '</span></div>';
-  });
-  document.getElementById('statsBar').innerHTML = html;
-}
-
-function renderDevices(devices) {
-  renderStats(devices);
-  var empty = document.getElementById('devicesEmpty'), table = document.getElementById('devicesTable'), tbody = document.getElementById('devicesBody');
-  if (!devices.length) { table.style.display='none'; empty.style.display='block'; return; }
-  empty.style.display='none'; table.style.display='table'; tbody.innerHTML='';
-  devices.forEach(function(d, i) {
-    var seat = [d.seat_number, d.seat_letter].filter(Boolean).join('');
-    var date = d.last_movement ? new Date(d.last_movement).toLocaleDateString('ar-EG') : '—';
-    var tr = document.createElement('tr'); tr.className='device-row';
-    tr.onclick = function() { openDeviceModal(d); };
-    tr.innerHTML = '<td>'+(i+1)+'</td><td>'+(d.serial_number||'—')+'</td><td>'+(d.asset_number||'—')+'</td><td>'+(d.device_type||'—')+'</td><td>'+(d.department||'—')+'</td><td>'+(d.current_location||'—')+'</td><td>'+(d.floor||'—')+'</td><td>'+(d.room||'—')+'</td><td>'+(seat?'<span class="seat-badge">'+seat+'</span>':'—')+'</td><td>'+date+'</td><td>'+(d.moved_by||'—')+'</td>';
-    tbody.appendChild(tr);
-  });
-}
-
-async function openDeviceModal(d) {
-  document.getElementById('deviceModalTitle').textContent = d.device_type||'تفاصيل الجهاز';
-  document.getElementById('d-serial').textContent = d.serial_number||'—';
-  document.getElementById('d-asset').textContent = d.asset_number||'—';
-  document.getElementById('d-type').textContent = d.device_type||'—';
-  document.getElementById('d-dept').textContent = d.department||'—';
-  document.getElementById('d-location').textContent = d.current_location||'—';
-  document.getElementById('d-floor').textContent = d.floor||'—';
-  document.getElementById('d-room').textContent = d.room||'—';
-  document.getElementById('d-seat').textContent = [d.seat_number,d.seat_letter].filter(Boolean).join('')||'—';
-  document.getElementById('d-lastmove').textContent = d.last_movement ? new Date(d.last_movement).toLocaleString('ar-EG') : '—';
-  document.getElementById('d-movedby').textContent = d.moved_by||'—';
-  document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">⏳ جاري التحميل...</div>';
-  document.getElementById('deviceModal').classList.add('show');
-  try {
-    var result = await api('getDeviceMovements', { spreadsheetId: currentUser.spreadsheetId, serial: d.serial_number, assetNumber: d.asset_number });
-    if (result.success && result.data && result.data.length) {
-      var html = '<table class="mov-table"><thead><tr><th>التاريخ</th><th>بواسطة</th><th>من</th><th>إلى</th></tr></thead><tbody>';
-      result.data.forEach(function(m) {
-        var from=[m.from_location,m.from_floor,m.from_room].filter(Boolean).join(' / ');
-        var to=[m.to_location,m.to_floor,m.to_room].filter(Boolean).join(' / ');
-        var date = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG') : '—';
-        html += '<tr><td>'+date+'</td><td>'+(m.moved_by||'—')+'</td><td>'+(from||'—')+'</td><td>'+(to||'—')+'</td></tr>';
-      });
-      html += '</tbody></table>';
-      document.getElementById('movementsContainer').innerHTML = html;
-    } else { document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">لا توجد تحركات مسجلة</div>'; }
-  } catch(e) { document.getElementById('movementsContainer').innerHTML = '<div class="no-mov">حدث خطأ في التحميل</div>'; }
-}
-function closeDeviceModal() { document.getElementById('deviceModal').classList.remove('show'); }
-
-function startScan(fieldId) {
-  if (scannerActive) { stopScanner(); return; }
-  var overlay = document.createElement('div');
-  overlay.id = 'scanOverlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
-  var readerDiv = document.createElement('div'); readerDiv.id='qr-reader'; readerDiv.style.cssText='width:300px;max-width:90%;border-radius:16px;overflow:hidden;';
-  var status = document.createElement('div'); status.id='qr-status'; status.style.cssText='color:white;font-size:14px;text-align:center;'; status.textContent='⏳ جاري تشغيل الكاميرا...';
-  var closeBtn = document.createElement('button'); closeBtn.textContent='✕ إغلاق'; closeBtn.style.cssText='padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;'; closeBtn.onclick=stopScanner;
-  overlay.appendChild(readerDiv); overlay.appendChild(status); overlay.appendChild(closeBtn);
-  document.body.appendChild(overlay);
-  try {
-    html5QrCode = new Html5Qrcode('qr-reader');
-    html5QrCode.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      function(decoded) { document.getElementById(fieldId).value=decoded; if(fieldId==='serial') onSerialChange(); else onAssetChange(); stopScanner(); },
-      function() {}
-    ).then(function() { scannerActive=true; status.textContent='✅ ضع الباركود أمام الكاميرا'; })
-    .catch(function() { status.textContent='❌ فشل تشغيل الكاميرا — تأكد من منح الإذن'; setTimeout(stopScanner,2000); });
-  } catch(e) { alert('لا يمكن الوصول للكاميرا'); stopScanner(); }
-}
-function stopScanner() {
-  if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(function(){html5QrCode.clear();}).catch(function(){});
-  var o=document.getElementById('scanOverlay'); if(o) o.remove();
-  scannerActive=false; html5QrCode=null;
-}
-
-window.addEventListener('DOMContentLoaded', async function() {
-  var saved = sessionStorage.getItem('ats_user');
-  if (saved) {
-    try { currentUser=JSON.parse(saved); await loadSettingsAndShowHome(); return; } catch(e) { sessionStorage.removeItem('ats_user'); }
+  } catch(e) {
+    errorEl.textContent = "حدث خطأ في الاتصال";
+    errorEl.style.display = 'block';
   }
-  showPage('loginPage');
-});
+}
+
+function showMainPage() {
+  document.getElementById('loginPage').classList.remove('active');
+  document.getElementById('mainPage').classList.add('active');
+  document.getElementById('userInfo').textContent = currentUser.fullName;
+  document.getElementById('locationBadge').textContent = `📍 ${currentUser.locationName}`;
+}
+
+function logout() {
+  localStorage.removeItem('currentUser');
+  location.reload();
+}
+
+// ==================== Page Navigation ====================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(page + 'Page').classList.add('active');
+
+  if (page === 'movement') loadMovementPage();
+  if (page === 'devices') loadDevicesPage();
+}
+
+// ==================== Init ====================
+window.onload = () => {
+  const saved = localStorage.getItem('currentUser');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    showMainPage();
+  }
+};
 </script>
 </body>
 </html>
