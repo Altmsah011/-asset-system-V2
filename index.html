@@ -10,7 +10,6 @@
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; min-height: 100vh; }
 
 /* ========== LOGIN ========== */
-#page-login { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
 .login-card { background: white; border-radius: 16px; padding: 2rem; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); margin: 1rem; }
 .logo { text-align: center; margin-bottom: 1.5rem; }
 .logo-icon { font-size: 48px; }
@@ -20,186 +19,87 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; min-hei
 /* ========== FORMS ========== */
 .form-group { margin-bottom: 1rem; }
 label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; }
-input, select {
-  width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0;
-  border-radius: 8px; font-size: 14px; outline: none;
-  transition: border 0.2s; background: white; font-family: inherit;
-}
+input, select { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; background: white; font-family: inherit; }
 input:focus, select:focus { border-color: #4f46e5; }
-.btn-primary {
-  width: 100%; padding: 12px; background: #4f46e5; color: white;
-  border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: .5rem;
-}
+.btn-primary { width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: .5rem; }
 .btn-primary:hover { background: #4338ca; }
 .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
-.error-box {
-  background: #fef2f2; color: #dc2626; padding: 10px;
-  border-radius: 8px; font-size: 13px; margin-top: 1rem;
-  text-align: center; display: none;
-}
-.success-box {
-  background: #f0fdf4; color: #16a34a; padding: 12px;
-  border-radius: 8px; text-align: center; font-size: 14px;
-  display: none; margin-top: 1rem;
-}
+.error-box { background: #fef2f2; color: #dc2626; padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 1rem; text-align: center; display: none; }
+.success-box { background: #f0fdf4; color: #16a34a; padding: 12px; border-radius: 8px; text-align: center; font-size: 14px; display: none; margin-top: 1rem; }
 
 /* ========== NAVBAR ========== */
-.navbar {
-  background: white; padding: 1rem 1.5rem;
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 50;
-}
+.navbar { background: white; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 50; }
 .navbar-left { display: flex; align-items: center; gap: 10px; }
 .navbar h2 { font-size: 16px; color: #1a1a2e; }
-.back-btn {
-  background: #f3f4f6; border: none; border-radius: 8px;
-  padding: 6px 12px; color: #4f46e5; font-size: 14px;
-  font-weight: bold; cursor: pointer; font-family: inherit;
-}
+.back-btn { background: #f3f4f6; border: none; border-radius: 8px; padding: 6px 12px; color: #4f46e5; font-size: 14px; font-weight: bold; cursor: pointer; font-family: inherit; }
 .user-info { font-size: 13px; color: #888; display: flex; align-items: center; gap: 12px; }
-.logout-btn {
-  font-size: 12px; color: #dc2626; cursor: pointer;
-  border: 1px solid #fca5a5; padding: 4px 10px;
-  border-radius: 6px; background: #fef2f2;
-}
+.logout-btn { font-size: 12px; color: #dc2626; cursor: pointer; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 6px; background: #fef2f2; }
 
 /* ========== PAGES ========== */
 .page { display: none; min-height: 100vh; }
 .page.active { display: block; }
-#page-login.active { display: flex; }
+#page-login.active { display: flex; align-items: center; justify-content: center; }
+#page-login { display: none; }
+#page-login.active { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
 .content { padding: 1.5rem; max-width: 700px; margin: 0 auto; }
 
 /* ========== HOME ========== */
-.location-badge {
-  background: #ede9fe; color: #5b21b6;
-  padding: 6px 14px; border-radius: 20px;
-  font-size: 13px; margin-bottom: 1.5rem; display: inline-block;
-}
+.location-badge { background: #ede9fe; color: #5b21b6; padding: 6px 14px; border-radius: 20px; font-size: 13px; margin-bottom: 1.5rem; display: inline-block; }
 .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.menu-card {
-  background: white; border-radius: 16px; padding: 2rem 1rem;
-  text-align: center; cursor: pointer; border: 2px solid transparent;
-  transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
+.menu-card { background: white; border-radius: 16px; padding: 2rem 1rem; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .menu-card:hover { border-color: #4f46e5; transform: translateY(-2px); }
 .menu-card .card-icon { font-size: 40px; margin-bottom: .75rem; display: block; }
 .menu-card h3 { font-size: 15px; color: #1a1a2e; }
 .menu-card p { font-size: 12px; color: #888; margin-top: 4px; }
 
 /* ========== MOVEMENT FORM ========== */
-.section {
-  background: white; border-radius: 16px; padding: 1.25rem;
-  margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.section-title {
-  font-size: 14px; font-weight: 600; color: #4f46e5;
-  margin-bottom: 1rem; padding-bottom: 8px;
-  border-bottom: 2px solid #ede9fe;
-}
+.section { background: white; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.section-title { font-size: 14px; font-weight: 600; color: #4f46e5; margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 2px solid #ede9fe; }
 .input-wrap { position: relative; display: flex; align-items: center; }
 .input-wrap input, .input-wrap select { flex: 1; }
-.scan-btn {
-  position: absolute; left: 8px; background: none;
-  border: none; cursor: pointer; font-size: 22px; padding: 4px;
-  line-height: 1;
-}
-.scan-btn-active { color: #dc2626; }
-.add-btn {
-  background: #22c55e; color: white; border: none;
-  border-radius: 6px; padding: 6px 10px; font-size: 18px;
-  cursor: pointer; margin-right: 6px; flex-shrink: 0;
-}
+.scan-btn { position: absolute; left: 8px; background: none; border: none; cursor: pointer; font-size: 22px; padding: 4px; line-height: 1; }
+.add-btn { background: #22c55e; color: white; border: none; border-radius: 6px; padding: 6px 10px; font-size: 18px; cursor: pointer; margin-right: 6px; flex-shrink: 0; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-.opt-badge {
-  font-size: 11px; background: #ede9fe; color: #5b21b6;
-  padding: 2px 8px; border-radius: 10px; margin-right: 6px;
-}
-.submit-btn {
-  width: 100%; padding: 14px; background: #4f46e5; color: white;
-  border: none; border-radius: 12px; font-size: 16px;
-  cursor: pointer; margin-top: .5rem; font-family: inherit;
-}
+.opt-badge { font-size: 11px; background: #ede9fe; color: #5b21b6; padding: 2px 8px; border-radius: 10px; margin-right: 6px; }
+.submit-btn { width: 100%; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; margin-top: .5rem; font-family: inherit; }
 .submit-btn:hover { background: #4338ca; }
 .submit-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
 
 /* ========== SCANNER ========== */
-#scanner-container {
-  background: black; border-radius: 12px; overflow: hidden;
-  margin-bottom: 1rem; display: none;
-}
+#scanner-container { background: black; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; display: none; }
 #scanner-container.show { display: block; }
 #reader { width: 100%; }
-.scanner-close-btn {
-  width: 100%; padding: 10px; background: #dc2626; color: white;
-  border: none; font-size: 14px; cursor: pointer; font-family: inherit;
-}
+.scanner-close-btn { width: 100%; padding: 10px; background: #dc2626; color: white; border: none; font-size: 14px; cursor: pointer; font-family: inherit; }
 
 /* ========== DEVICES PAGE ========== */
-.search-bar {
-  background: white; border-radius: 12px; padding: 1rem;
-  margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-}
+.search-bar { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .search-bar input { flex: 1; min-width: 160px; }
 .search-bar select { min-width: 120px; }
-.clear-btn {
-  padding: 8px 14px; background: #f3f4f6; color: #666;
-  border: none; border-radius: 8px; font-size: 13px;
-  cursor: pointer; font-family: inherit; white-space: nowrap;
-}
+.clear-btn { padding: 8px 14px; background: #f3f4f6; color: #666; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .stats-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-.stat-card {
-  background: white; border-radius: 10px; padding: 8px 14px;
-  font-size: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  display: flex; align-items: center; gap: 6px;
-}
+.stat-card { background: white; border-radius: 10px; padding: 8px 14px; font-size: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 6px; }
 .stat-num { font-size: 16px; font-weight: 600; color: #4f46e5; }
 .stat-label { color: #888; }
-.table-wrap {
-  background: white; border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto;
-}
+.table-wrap { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th {
-  text-align: right; padding: 10px 12px; background: #f8f9fa;
-  color: #666; font-weight: 500; border-bottom: 1px solid #e0e0e0;
-  white-space: nowrap;
-}
+th { text-align: right; padding: 10px 12px; background: #f8f9fa; color: #666; font-weight: 500; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
 td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #1a1a2e; vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
 tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
-.seat-badge {
-  display: inline-block; background: #ede9fe; color: #5b21b6;
-  padding: 2px 8px; border-radius: 10px; font-size: 11px;
-}
+.seat-badge { display: inline-block; background: #ede9fe; color: #5b21b6; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
 .empty-msg { text-align: center; padding: 3rem; color: #888; font-size: 14px; }
 .loading-msg { text-align: center; padding: 3rem; color: #4f46e5; font-size: 14px; }
 
 /* ========== MODAL ========== */
-.modal {
-  display: none; position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-  z-index: 200; align-items: flex-start; justify-content: center;
-  overflow-y: auto; padding: 2rem 1rem;
-}
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
 .modal.show { display: flex; }
-.modal-card {
-  background: white; border-radius: 16px;
-  width: 100%; max-width: 560px; overflow: hidden; margin: auto;
-}
-.modal-header {
-  background: #4f46e5; color: white;
-  padding: 1.25rem 1.5rem; display: flex;
-  align-items: center; justify-content: space-between;
-}
+.modal-card { background: white; border-radius: 16px; width: 100%; max-width: 560px; overflow: hidden; margin: auto; }
+.modal-header { background: #4f46e5; color: white; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
 .modal-header h3 { font-size: 16px; }
 .modal-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
 .modal-body { padding: 1.5rem; overflow-y: auto; max-height: 75vh; }
 .detail-section { margin-bottom: 1.25rem; }
-.detail-section-title {
-  font-size: 12px; font-weight: 600; color: #4f46e5;
-  margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #ede9fe;
-}
+.detail-section-title { font-size: 12px; font-weight: 600; color: #4f46e5; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #ede9fe; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .detail-item { background: #f8f9fa; border-radius: 8px; padding: 8px 12px; }
 .detail-label { font-size: 11px; color: #888; margin-bottom: 2px; }
@@ -209,20 +109,11 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 .mov-table td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
 .mov-table tr:last-child td { border-bottom: none; }
 .no-mov { text-align: center; padding: 1rem; color: #888; font-size: 13px; }
-
-/* add-modal */
 .add-modal-card { max-width: 340px; }
-.add-modal-input {
-  width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0;
-  border-radius: 8px; font-size: 14px; outline: none;
-  margin-bottom: 1rem; font-family: inherit;
-}
+.add-modal-input { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 1rem; font-family: inherit; }
 .add-modal-input:focus { border-color: #4f46e5; }
 .modal-btns { display: flex; gap: 8px; }
-.modal-btns button {
-  flex: 1; padding: 10px; border-radius: 8px;
-  border: none; cursor: pointer; font-size: 14px; font-family: inherit;
-}
+.modal-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-family: inherit; }
 .btn-ok { background: #4f46e5; color: white; }
 .btn-cancel { background: #f3f4f6; color: #666; }
 
@@ -249,9 +140,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
     </div>
     <div class="form-group">
       <label>كلمة المرور</label>
-      <input type="password" id="inp-password" placeholder="اكتب كلمة المرور"
-             autocomplete="current-password"
-             onkeydown="if(event.key==='Enter') doLogin()">
+      <input type="password" id="inp-password" placeholder="اكتب كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
     </div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">دخول</button>
     <div class="error-box" id="login-error"></div>
@@ -293,125 +182,74 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
     </div>
   </div>
   <div class="content">
-
-    <!-- Scanner -->
     <div id="scanner-container">
       <div id="reader"></div>
       <button class="scanner-close-btn" onclick="stopScanner()">✕ إغلاق الكاميرا</button>
     </div>
-
-    <!-- بيانات الجهاز -->
     <div class="section">
       <div class="section-title">📋 بيانات الجهاز</div>
-      <div class="form-group">
-        <label>Serial Number</label>
+      <div class="form-group"><label>Serial Number</label>
         <div class="input-wrap">
-          <input type="text" id="m-serial" placeholder="اكتب أو امسح الباركود"
-                 oninput="onSerialInput()" onchange="onFieldChange('serial')">
-          <button class="scan-btn" id="scan-serial-btn" onclick="startScan('m-serial')" title="مسح بالكاميرا">📷</button>
+          <input type="text" id="m-serial" placeholder="اكتب أو امسح الباركود" oninput="onSerialInput()" onchange="onFieldChange('serial')">
+          <button class="scan-btn" onclick="startScan('m-serial')">📷</button>
         </div>
       </div>
-      <div class="form-group">
-        <label>رقم الأصل</label>
+      <div class="form-group"><label>رقم الأصل</label>
         <div class="input-wrap">
-          <input type="text" id="m-asset" placeholder="اكتب أو امسح الباركود"
-                 oninput="onAssetInput()" onchange="onFieldChange('asset')">
-          <button class="scan-btn" id="scan-asset-btn" onclick="startScan('m-asset')" title="مسح بالكاميرا">📷</button>
+          <input type="text" id="m-asset" placeholder="اكتب أو امسح الباركود" oninput="onAssetInput()" onchange="onFieldChange('asset')">
+          <button class="scan-btn" onclick="startScan('m-asset')">📷</button>
         </div>
       </div>
-      <div class="form-group">
-        <label>نوع الجهاز</label>
+      <div class="form-group"><label>نوع الجهاز</label>
         <div class="input-wrap">
           <select id="m-deviceType"><option value="">-- اختر --</option></select>
           <button class="add-btn" onclick="openAddModal('deviceType','إضافة نوع جهاز',1)">+</button>
         </div>
       </div>
-      <div class="form-group">
-        <label>الإدارة</label>
+      <div class="form-group"><label>الإدارة</label>
         <div class="input-wrap">
           <select id="m-department"><option value="">-- اختر --</option></select>
           <button class="add-btn" onclick="openAddModal('department','إضافة إدارة',2)">+</button>
         </div>
       </div>
     </div>
-
-    <!-- من الموقع القديم -->
     <div class="section">
       <div class="section-title">📍 من الموقع القديم <span class="opt-badge">اختياري</span></div>
-      <div class="form-group">
-        <label>الموقع</label>
-        <div class="input-wrap">
-          <select id="m-fromLocation"><option value="">-- اختر --</option></select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>الدور</label>
-        <div class="input-wrap">
-          <select id="m-fromFloor" onchange="filterRooms('from')"><option value="">-- اختر --</option></select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>الصالة / الغرفة</label>
+      <div class="form-group"><label>الموقع</label><select id="m-fromLocation"><option value="">-- اختر --</option></select></div>
+      <div class="form-group"><label>الدور</label><select id="m-fromFloor" onchange="filterRooms('from')"><option value="">-- اختر --</option></select></div>
+      <div class="form-group"><label>الصالة / الغرفة</label>
         <div class="input-wrap">
           <select id="m-fromRoom"><option value="">-- اختر --</option></select>
           <button class="add-btn" onclick="openAddRoomModal('from')">+</button>
         </div>
       </div>
       <div class="grid2">
-        <div class="form-group">
-          <label>رقم Seat</label>
-          <select id="m-fromSeatNum"><option value="">--</option></select>
-        </div>
-        <div class="form-group">
-          <label>حرف Seat</label>
-          <select id="m-fromSeatLetter"><option value="">--</option></select>
-        </div>
+        <div class="form-group"><label>رقم Seat</label><select id="m-fromSeatNum"><option value="">--</option></select></div>
+        <div class="form-group"><label>حرف Seat</label><select id="m-fromSeatLetter"><option value="">--</option></select></div>
       </div>
     </div>
-
-    <!-- إلى الموقع الجديد -->
     <div class="section">
       <div class="section-title">🚀 إلى الموقع الجديد</div>
-      <div class="form-group">
-        <label>الموقع</label>
+      <div class="form-group"><label>الموقع</label>
         <div class="input-wrap">
           <select id="m-toLocation"><option value="">-- اختر --</option></select>
           <button class="add-btn" onclick="openAddModal('site','إضافة موقع',6)">+</button>
         </div>
       </div>
-      <div class="form-group">
-        <label>الدور</label>
-        <div class="input-wrap">
-          <select id="m-toFloor" onchange="filterRooms('to')"><option value="">-- اختر --</option></select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>الصالة / الغرفة</label>
+      <div class="form-group"><label>الدور</label><select id="m-toFloor" onchange="filterRooms('to')"><option value="">-- اختر --</option></select></div>
+      <div class="form-group"><label>الصالة / الغرفة</label>
         <div class="input-wrap">
           <select id="m-toRoom"><option value="">-- اختر --</option></select>
           <button class="add-btn" onclick="openAddRoomModal('to')">+</button>
         </div>
       </div>
       <div class="grid2">
-        <div class="form-group">
-          <label>رقم Seat</label>
-          <select id="m-toSeatNum"><option value="">--</option></select>
-        </div>
-        <div class="form-group">
-          <label>حرف Seat</label>
-          <select id="m-toSeatLetter"><option value="">--</option></select>
-        </div>
+        <div class="form-group"><label>رقم Seat</label><select id="m-toSeatNum"><option value="">--</option></select></div>
+        <div class="form-group"><label>حرف Seat</label><select id="m-toSeatLetter"><option value="">--</option></select></div>
       </div>
-      <div class="form-group">
-        <label>رقم التيكت <span class="opt-badge">اختياري</span></label>
-        <input type="text" id="m-ticket" placeholder="TK-2025-001">
-      </div>
-      <div class="form-group">
-        <label>ملاحظات <span class="opt-badge">اختياري</span></label>
-        <input type="text" id="m-notes" placeholder="أي ملاحظات إضافية">
-      </div>
+      <div class="form-group"><label>رقم التيكت <span class="opt-badge">اختياري</span></label><input type="text" id="m-ticket" placeholder="TK-2025-001"></div>
+      <div class="form-group"><label>ملاحظات <span class="opt-badge">اختياري</span></label><input type="text" id="m-notes" placeholder="أي ملاحظات إضافية"></div>
     </div>
-
     <button class="submit-btn" id="submit-btn" onclick="submitMovement()">✅ تسجيل الحركة</button>
     <div class="success-box" id="m-success">✅ تم تسجيل الحركة بنجاح!</div>
     <div class="error-box" id="m-error"></div>
@@ -429,12 +267,8 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
   <div class="content">
     <div class="search-bar">
       <input type="text" id="d-search" placeholder="🔍 Serial أو رقم الأصل..." oninput="filterDevices()">
-      <select id="d-floor" onchange="onDeviceFloorChange()">
-        <option value="">كل الأدوار</option>
-      </select>
-      <select id="d-room" onchange="filterDevices()">
-        <option value="">كل الغرف</option>
-      </select>
+      <select id="d-floor" onchange="onDeviceFloorChange()"><option value="">كل الأدوار</option></select>
+      <select id="d-room" onchange="filterDevices()"><option value="">كل الغرف</option></select>
       <button class="clear-btn" onclick="clearDeviceFilters()">مسح الفلتر</button>
     </div>
     <div class="stats-bar" id="stats-bar"></div>
@@ -442,14 +276,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
       <div class="loading-msg" id="d-loading">⏳ جاري تحميل الأجهزة...</div>
       <div class="empty-msg" id="d-empty" style="display:none">لا توجد أجهزة</div>
       <table id="d-table" style="display:none">
-        <thead>
-          <tr>
-            <th>#</th><th>Serial Number</th><th>رقم الأصل</th>
-            <th>نوع الجهاز</th><th>الإدارة</th><th>الموقع</th>
-            <th>الدور</th><th>الغرفة</th><th>Seat</th>
-            <th>آخر تحرك</th><th>بواسطة</th>
-          </tr>
-        </thead>
+        <thead><tr><th>#</th><th>Serial Number</th><th>رقم الأصل</th><th>نوع الجهاز</th><th>الإدارة</th><th>الموقع</th><th>الدور</th><th>الغرفة</th><th>Seat</th><th>آخر تحرك</th><th>بواسطة</th></tr></thead>
         <tbody id="d-body"></tbody>
       </table>
     </div>
@@ -459,10 +286,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 <!-- ======== DEVICE DETAIL MODAL ======== -->
 <div class="modal" id="device-modal">
   <div class="modal-card">
-    <div class="modal-header">
-      <h3 id="dm-title">تفاصيل الجهاز</h3>
-      <button class="modal-close" onclick="closeDeviceModal()">✕</button>
-    </div>
+    <div class="modal-header"><h3 id="dm-title">تفاصيل الجهاز</h3><button class="modal-close" onclick="closeDeviceModal()">✕</button></div>
     <div class="modal-body">
       <div class="detail-section">
         <div class="detail-section-title">📋 بيانات الجهاز</div>
@@ -490,10 +314,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 <!-- ======== ADD ITEM MODAL ======== -->
 <div class="modal" id="add-modal">
   <div class="modal-card add-modal-card">
-    <div class="modal-header">
-      <h3 id="add-modal-title">إضافة جديد</h3>
-      <button class="modal-close" onclick="closeAddModal()">✕</button>
-    </div>
+    <div class="modal-header"><h3 id="add-modal-title">إضافة جديد</h3><button class="modal-close" onclick="closeAddModal()">✕</button></div>
     <div class="modal-body">
       <input type="text" class="add-modal-input" id="add-modal-input" placeholder="اكتب القيمة الجديدة">
       <div class="modal-btns">
@@ -505,112 +326,62 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 </div>
 
 <script>
-// =============================================
-// CONFIG — غيّر الرابط ده بعد كل نشر جديد
-// =============================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbw0BYktj7ke3X4eDTk9pv3Ba50R4rw-jNv9tMPV5Vdo2HZ6Os3ZWZpESp1rTc43J6nd/exec';
 
-// =============================================
-// API — JSONP
-// =============================================
 function api(action, params = {}) {
   return new Promise((resolve, reject) => {
     const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const dataStr = encodeURIComponent(JSON.stringify(params));
-    const url = API_URL + '?callback=' + encodeURIComponent(cbName)
-              + '&action=' + encodeURIComponent(action)
-              + '&data=' + dataStr;
-
+    const url = API_URL + '?callback=' + encodeURIComponent(cbName) + '&action=' + encodeURIComponent(action) + '&data=' + dataStr;
     let done = false;
     const script = document.createElement('script');
-
     window[cbName] = function(result) {
-      if (done) return;
-      done = true;
+      if (done) return; done = true;
       delete window[cbName];
       if (script.parentNode) script.parentNode.removeChild(script);
       resolve(result);
     };
-
     script.src = url;
     script.onerror = function() {
-      if (done) return;
-      done = true;
+      if (done) return; done = true;
       delete window[cbName];
       if (script.parentNode) script.parentNode.removeChild(script);
       reject(new Error('تعذّر الاتصال بالخادم'));
     };
     document.head.appendChild(script);
-
     setTimeout(function() {
-      if (!done) {
-        done = true;
-        delete window[cbName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        reject(new Error('انتهت مهلة الاتصال (30 ثانية)'));
-      }
+      if (!done) { done = true; delete window[cbName]; if (script.parentNode) script.parentNode.removeChild(script); reject(new Error('انتهت مهلة الاتصال')); }
     }, 30000);
   });
 }
 
-// =============================================
-// STATE
-// =============================================
-let currentUser   = null;
-let appSettings   = {};
-let allDevices    = [];
-let autoFilled    = false;
-let lastSerial    = '';
-let lastAsset     = '';
-let lookupTimer   = null;
-let activeScanner = null;
-let activeScanField = null;
-let addModalMeta  = {};  // { type, title, column?, prefix? }
+let currentUser = null, appSettings = {}, allDevices = [];
+let autoFilled = false, lastSerial = '', lastAsset = '', lookupTimer = null;
+let activeScanner = null, activeScanField = null, addModalMeta = {};
 
-// =============================================
-// PAGE NAVIGATION
-// =============================================
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
 }
 
-// =============================================
-// LOGIN
-// =============================================
 async function doLogin() {
   const username = document.getElementById('inp-username').value.trim();
   const password = document.getElementById('inp-password').value.trim();
   if (!username || !password) { showLoginError('من فضلك اكتب اسم المستخدم وكلمة المرور'); return; }
-
   const btn = document.getElementById('login-btn');
   btn.disabled = true; btn.textContent = 'جاري التحقق...';
   hideLoginError();
-
   try {
     const res = await api('login', { username, password });
-    if (res.success) {
-      currentUser = res.user;
-      await loadSettings();
-      showHome();
-    } else {
-      showLoginError(res.message || 'اسم المستخدم أو كلمة المرور غلط');
-    }
-  } catch(e) {
-    showLoginError('حدث خطأ في الاتصال: ' + e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'دخول';
-  }
+    if (res.success) { currentUser = res.user; await loadSettings(); showHome(); }
+    else showLoginError(res.message || 'اسم المستخدم أو كلمة المرور غلط');
+  } catch(e) { showLoginError('حدث خطأ في الاتصال: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'دخول'; }
 }
 
-function showLoginError(msg) {
-  const el = document.getElementById('login-error');
-  el.textContent = msg; el.style.display = 'block';
-}
-function hideLoginError() {
-  document.getElementById('login-error').style.display = 'none';
-}
+function showLoginError(msg) { const el = document.getElementById('login-error'); el.textContent = msg; el.style.display = 'block'; }
+function hideLoginError() { document.getElementById('login-error').style.display = 'none'; }
 
 function doLogout() {
   currentUser = null; appSettings = {}; allDevices = [];
@@ -619,18 +390,12 @@ function doLogout() {
   showPage('page-login');
 }
 
-// =============================================
-// HOME
-// =============================================
 function showHome() {
   document.getElementById('nav-username').textContent = currentUser.fullName;
   document.getElementById('home-location').textContent = currentUser.locationName;
   showPage('page-home');
 }
 
-// =============================================
-// SETTINGS
-// =============================================
 async function loadSettings() {
   try {
     const res = await api('getSettings', { spreadsheetId: currentUser.spreadsheetId });
@@ -638,9 +403,6 @@ async function loadSettings() {
   } catch(e) { console.error('settings error', e); }
 }
 
-// =============================================
-// MOVEMENT PAGE
-// =============================================
 async function openMovementPage() {
   showPage('page-movement');
   populateMovementSelects();
@@ -648,19 +410,18 @@ async function openMovementPage() {
 }
 
 function populateMovementSelects() {
-  fillSelect('m-deviceType',   appSettings.deviceTypes || []);
-  fillSelect('m-department',   appSettings.departments || []);
-  fillSelect('m-fromLocation', appSettings.sites       || []);
-  fillSelect('m-toLocation',   appSettings.sites       || []);
-  fillSelectFloors('m-fromFloor', appSettings.floors   || []);
-  fillSelectFloors('m-toFloor',   appSettings.floors   || []);
+  fillSelect('m-deviceType', appSettings.deviceTypes || []);
+  fillSelect('m-department', appSettings.departments || []);
+  fillSelect('m-fromLocation', appSettings.sites || []);
+  fillSelect('m-toLocation', appSettings.sites || []);
+  fillSelectFloors('m-fromFloor', appSettings.floors || []);
+  fillSelectFloors('m-toFloor', appSettings.floors || []);
   fillSeats('m-fromSeatNum','m-fromSeatLetter');
   fillSeats('m-toSeatNum','m-toSeatLetter');
 }
 
 function fillSelect(id, items) {
-  const sel = document.getElementById(id);
-  const prev = sel.value;
+  const sel = document.getElementById(id); const prev = sel.value;
   sel.innerHTML = '<option value="">-- اختر --</option>';
   items.forEach(i => { const o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o); });
   if (prev) sel.value = prev;
@@ -674,7 +435,7 @@ function fillSelectFloors(id, floors) {
 
 function filterRooms(prefix) {
   const floor = document.getElementById('m-' + prefix + 'Floor').value;
-  const sel   = document.getElementById('m-' + prefix + 'Room');
+  const sel = document.getElementById('m-' + prefix + 'Room');
   sel.innerHTML = '<option value="">-- اختر --</option>';
   (appSettings.rooms || []).filter(r => !floor || r.floor === floor).forEach(r => {
     const o = document.createElement('option'); o.value = r.name; o.textContent = r.name; sel.appendChild(o);
@@ -682,23 +443,14 @@ function filterRooms(prefix) {
 }
 
 function fillSeats(numId, letterId) {
-  const numSel = document.getElementById(numId);
-  numSel.innerHTML = '<option value="">--</option>';
-  for (let i = 1; i <= 50; i++) { const o = document.createElement('option'); o.value = i; o.textContent = i; numSel.appendChild(o); }
-  const letSel = document.getElementById(letterId);
-  letSel.innerHTML = '<option value="">--</option>';
-  for (let i = 65; i <= 90; i++) { const o = document.createElement('option'); o.value = String.fromCharCode(i); o.textContent = String.fromCharCode(i); letSel.appendChild(o); }
+  const n = document.getElementById(numId); n.innerHTML = '<option value="">--</option>';
+  for (let i = 1; i <= 50; i++) { const o = document.createElement('option'); o.value = i; o.textContent = i; n.appendChild(o); }
+  const l = document.getElementById(letterId); l.innerHTML = '<option value="">--</option>';
+  for (let i = 65; i <= 90; i++) { const o = document.createElement('option'); o.value = String.fromCharCode(i); o.textContent = String.fromCharCode(i); l.appendChild(o); }
 }
 
-// --- Lookup ---
-function onSerialInput() {
-  const val = document.getElementById('m-serial').value.trim();
-  if (!val && autoFilled) clearAutoFilled();
-}
-function onAssetInput() {
-  const val = document.getElementById('m-asset').value.trim();
-  if (!val && autoFilled) clearAutoFilled();
-}
+function onSerialInput() { if (!document.getElementById('m-serial').value.trim() && autoFilled) clearAutoFilled(); }
+function onAssetInput()  { if (!document.getElementById('m-asset').value.trim() && autoFilled) clearAutoFilled(); }
 function onFieldChange(field) {
   const serial = document.getElementById('m-serial').value.trim();
   const asset  = document.getElementById('m-asset').value.trim();
@@ -713,18 +465,13 @@ async function triggerLookup(serial, asset) {
   try {
     const res = await api('lookupDevice', { spreadsheetId: currentUser.spreadsheetId, serial, assetNumber: asset });
     if (res.success && res.device) {
-      autoFilled = true;
-      const d = res.device;
-      if (d.serial)           document.getElementById('m-serial').value = d.serial;
-      if (d.assetNumber)      document.getElementById('m-asset').value  = d.assetNumber;
-      if (d.deviceType)       document.getElementById('m-deviceType').value   = d.deviceType;
-      if (d.department)       document.getElementById('m-department').value   = d.department;
-      if (d.currentLocation)  document.getElementById('m-fromLocation').value = d.currentLocation;
-      if (d.floor) {
-        document.getElementById('m-fromFloor').value = d.floor;
-        filterRooms('from');
-        setTimeout(() => { if (d.room) document.getElementById('m-fromRoom').value = d.room; }, 80);
-      }
+      autoFilled = true; const d = res.device;
+      if (d.serial)          document.getElementById('m-serial').value = d.serial;
+      if (d.assetNumber)     document.getElementById('m-asset').value  = d.assetNumber;
+      if (d.deviceType)      document.getElementById('m-deviceType').value   = d.deviceType;
+      if (d.department)      document.getElementById('m-department').value   = d.department;
+      if (d.currentLocation) document.getElementById('m-fromLocation').value = d.currentLocation;
+      if (d.floor) { document.getElementById('m-fromFloor').value = d.floor; filterRooms('from'); setTimeout(() => { if (d.room) document.getElementById('m-fromRoom').value = d.room; }, 80); }
       if (d.seatNumber) document.getElementById('m-fromSeatNum').value    = d.seatNumber;
       if (d.seatLetter) document.getElementById('m-fromSeatLetter').value = d.seatLetter;
     }
@@ -733,86 +480,51 @@ async function triggerLookup(serial, asset) {
 
 function clearAutoFilled() {
   autoFilled = false; lastSerial = ''; lastAsset = '';
-  ['m-asset','m-deviceType','m-department','m-fromLocation',
-   'm-fromFloor','m-fromRoom','m-fromSeatNum','m-fromSeatLetter'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  ['m-asset','m-deviceType','m-department','m-fromLocation','m-fromFloor','m-fromRoom','m-fromSeatNum','m-fromSeatLetter'].forEach(id => document.getElementById(id).value = '');
 }
 
-// --- Submit ---
 async function submitMovement() {
   const serial = document.getElementById('m-serial').value.trim();
   const asset  = document.getElementById('m-asset').value.trim();
   if (!serial && !asset) { showMovError('لازم تكتب Serial Number أو رقم الأصل'); return; }
   if (!document.getElementById('m-toLocation').value) { showMovError('لازم تختار الموقع الجديد'); return; }
-
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = 'جاري الحفظ...';
-  hideMovError();
-
+  btn.disabled = true; btn.textContent = 'جاري الحفظ...'; hideMovError();
   const movementData = {
-    serial: serial,
-    assetNumber: asset,
-    deviceType:     document.getElementById('m-deviceType').value,
-    department:     document.getElementById('m-department').value,
-    fromLocation:   document.getElementById('m-fromLocation').value,
-    fromFloor:      document.getElementById('m-fromFloor').value,
-    fromRoom:       document.getElementById('m-fromRoom').value,
-    fromSeatNum:    document.getElementById('m-fromSeatNum').value,
-    fromSeatLetter: document.getElementById('m-fromSeatLetter').value,
-    toLocation:     document.getElementById('m-toLocation').value,
-    toFloor:        document.getElementById('m-toFloor').value,
-    toRoom:         document.getElementById('m-toRoom').value,
-    toSeatNum:      document.getElementById('m-toSeatNum').value,
-    toSeatLetter:   document.getElementById('m-toSeatLetter').value,
-    ticketNumber:   document.getElementById('m-ticket').value,
-    notes:          document.getElementById('m-notes').value,
+    serial, assetNumber: asset,
+    deviceType: document.getElementById('m-deviceType').value, department: document.getElementById('m-department').value,
+    fromLocation: document.getElementById('m-fromLocation').value, fromFloor: document.getElementById('m-fromFloor').value,
+    fromRoom: document.getElementById('m-fromRoom').value, fromSeatNum: document.getElementById('m-fromSeatNum').value,
+    fromSeatLetter: document.getElementById('m-fromSeatLetter').value, toLocation: document.getElementById('m-toLocation').value,
+    toFloor: document.getElementById('m-toFloor').value, toRoom: document.getElementById('m-toRoom').value,
+    toSeatNum: document.getElementById('m-toSeatNum').value, toSeatLetter: document.getElementById('m-toSeatLetter').value,
+    ticketNumber: document.getElementById('m-ticket').value, notes: document.getElementById('m-notes').value,
   };
-
   try {
-    const res = await api('saveMovement', {
-      spreadsheetId: currentUser.spreadsheetId,
-      locationName:  currentUser.locationName,
-      movementData,
-      userFullName:  currentUser.fullName
-    });
+    const res = await api('saveMovement', { spreadsheetId: currentUser.spreadsheetId, locationName: currentUser.locationName, movementData, userFullName: currentUser.fullName });
     if (res.success) {
       document.getElementById('m-success').style.display = 'block';
       autoFilled = false; lastSerial = ''; lastAsset = '';
-      setTimeout(() => {
-        document.getElementById('m-success').style.display = 'none';
-        resetMovementForm();
-      }, 2000);
-    } else {
-      showMovError(res.message || 'حدث خطأ في الحفظ');
-    }
-  } catch(e) {
-    showMovError('حدث خطأ: ' + e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = '✅ تسجيل الحركة';
-  }
+      setTimeout(() => { document.getElementById('m-success').style.display = 'none'; resetMovementForm(); }, 2000);
+    } else showMovError(res.message || 'حدث خطأ في الحفظ');
+  } catch(e) { showMovError('حدث خطأ: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = '✅ تسجيل الحركة'; }
 }
 
 function resetMovementForm() {
   ['m-serial','m-asset','m-ticket','m-notes'].forEach(id => document.getElementById(id).value = '');
-  ['m-deviceType','m-department','m-fromLocation','m-fromFloor','m-fromRoom',
-   'm-fromSeatNum','m-fromSeatLetter','m-toLocation','m-toFloor','m-toRoom',
-   'm-toSeatNum','m-toSeatLetter'].forEach(id => document.getElementById(id).value = '');
+  ['m-deviceType','m-department','m-fromLocation','m-fromFloor','m-fromRoom','m-fromSeatNum','m-fromSeatLetter','m-toLocation','m-toFloor','m-toRoom','m-toSeatNum','m-toSeatLetter'].forEach(id => document.getElementById(id).value = '');
   autoFilled = false; lastSerial = ''; lastAsset = '';
 }
 
 function showMovError(msg) { const el = document.getElementById('m-error'); el.textContent = msg; el.style.display = 'block'; }
 function hideMovError()     { document.getElementById('m-error').style.display = 'none'; }
 
-// =============================================
-// SCANNER
-// =============================================
 function startScan(fieldId) {
   if (activeScanner) { stopScanner(); return; }
   activeScanField = fieldId;
   const container = document.getElementById('scanner-container');
   container.classList.add('show');
-
   activeScanner = new Html5Qrcode('reader');
   activeScanner.start(
     { facingMode: 'environment' },
@@ -824,10 +536,7 @@ function startScan(fieldId) {
       else if (activeScanField === 'm-asset') onFieldChange('asset');
     },
     () => {}
-  ).catch(err => {
-    stopScanner();
-    alert('تعذّر تشغيل الكاميرا: ' + err);
-  });
+  ).catch(err => { stopScanner(); alert('تعذّر تشغيل الكاميرا: ' + err); });
 }
 
 function stopScanner() {
@@ -839,28 +548,19 @@ function stopScanner() {
   }
 }
 
-// =============================================
-// DEVICES PAGE
-// =============================================
 async function openDevicesPage() {
   showPage('page-devices');
   document.getElementById('d-loading').style.display = 'block';
   document.getElementById('d-table').style.display   = 'none';
   document.getElementById('d-empty').style.display   = 'none';
   document.getElementById('stats-bar').innerHTML = '';
-
-  // populate floor filter
   const floorSel = document.getElementById('d-floor');
   floorSel.innerHTML = '<option value="">كل الأدوار</option>';
-  (appSettings.floors || []).forEach(f => {
-    const o = document.createElement('option'); o.value = f; o.textContent = f; floorSel.appendChild(o);
-  });
-
+  (appSettings.floors || []).forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; floorSel.appendChild(o); });
   try {
     const res = await api('getDevices', { spreadsheetId: currentUser.spreadsheetId });
     allDevices = (res.success && res.data) ? res.data : [];
   } catch(e) { allDevices = []; }
-
   document.getElementById('d-loading').style.display = 'none';
   renderDevices(allDevices);
 }
@@ -869,9 +569,7 @@ function onDeviceFloorChange() {
   const floor = document.getElementById('d-floor').value;
   const roomSel = document.getElementById('d-room');
   roomSel.innerHTML = '<option value="">كل الغرف</option>';
-  (appSettings.rooms || []).filter(r => !floor || r.floor === floor).forEach(r => {
-    const o = document.createElement('option'); o.value = r.name; o.textContent = r.name; roomSel.appendChild(o);
-  });
+  (appSettings.rooms || []).filter(r => !floor || r.floor === floor).forEach(r => { const o = document.createElement('option'); o.value = r.name; o.textContent = r.name; roomSel.appendChild(o); });
   filterDevices();
 }
 
@@ -879,13 +577,10 @@ function filterDevices() {
   const search = document.getElementById('d-search').value.trim().toLowerCase();
   const floor  = document.getElementById('d-floor').value;
   const room   = document.getElementById('d-room').value;
-  const filtered = allDevices.filter(d => {
+  renderDevices(allDevices.filter(d => {
     const ms = !search || (d.serial_number||'').toLowerCase().includes(search) || (d.asset_number||'').toString().toLowerCase().includes(search);
-    const mf = !floor || d.floor === floor;
-    const mr = !room  || d.room  === room;
-    return ms && mf && mr;
-  });
-  renderDevices(filtered);
+    return ms && (!floor || d.floor === floor) && (!room || d.room === room);
+  }));
 }
 
 function clearDeviceFilters() {
@@ -896,44 +591,23 @@ function clearDeviceFilters() {
 }
 
 function renderDevices(devices) {
-  // stats
-  const statsBar = document.getElementById('stats-bar');
   const typeCounts = {};
   devices.forEach(d => { const t = d.device_type || 'غير محدد'; typeCounts[t] = (typeCounts[t]||0)+1; });
   let html = `<div class="stat-card"><span class="stat-num">${devices.length}</span><span class="stat-label">إجمالي الأجهزة</span></div>`;
-  Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => {
-    html += `<div class="stat-card"><span class="stat-num">${c}</span><span class="stat-label">${t}</span></div>`;
-  });
-  statsBar.innerHTML = html;
-
-  // table
-  const empty = document.getElementById('d-empty');
-  const table = document.getElementById('d-table');
-  const tbody = document.getElementById('d-body');
+  Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => { html += `<div class="stat-card"><span class="stat-num">${c}</span><span class="stat-label">${t}</span></div>`; });
+  document.getElementById('stats-bar').innerHTML = html;
+  const empty = document.getElementById('d-empty'), table = document.getElementById('d-table'), tbody = document.getElementById('d-body');
   if (devices.length === 0) { table.style.display='none'; empty.style.display='block'; return; }
-  empty.style.display = 'none'; table.style.display = 'table';
-  tbody.innerHTML = '';
+  empty.style.display = 'none'; table.style.display = 'table'; tbody.innerHTML = '';
   devices.forEach((d, idx) => {
     const seat = [d.seat_number, d.seat_letter].filter(Boolean).join('');
     const date = d.last_movement ? new Date(d.last_movement).toLocaleDateString('ar-EG') : '—';
-    const tr = document.createElement('tr');
-    tr.className = 'device-row';
-    tr.onclick = () => openDeviceModal(d);
-    tr.innerHTML = `
-      <td>${idx+1}</td>
-      <td>${d.serial_number||'—'}</td><td>${d.asset_number||'—'}</td>
-      <td>${d.device_type||'—'}</td><td>${d.department||'—'}</td>
-      <td>${d.current_location||'—'}</td><td>${d.floor||'—'}</td>
-      <td>${d.room||'—'}</td>
-      <td>${seat?'<span class="seat-badge">'+seat+'</span>':'—'}</td>
-      <td>${date}</td><td>${d.moved_by||'—'}</td>`;
+    const tr = document.createElement('tr'); tr.className = 'device-row'; tr.onclick = () => openDeviceModal(d);
+    tr.innerHTML = `<td>${idx+1}</td><td>${d.serial_number||'—'}</td><td>${d.asset_number||'—'}</td><td>${d.device_type||'—'}</td><td>${d.department||'—'}</td><td>${d.current_location||'—'}</td><td>${d.floor||'—'}</td><td>${d.room||'—'}</td><td>${seat?'<span class="seat-badge">'+seat+'</span>':'—'}</td><td>${date}</td><td>${d.moved_by||'—'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// =============================================
-// DEVICE DETAIL MODAL
-// =============================================
 async function openDeviceModal(d) {
   document.getElementById('dm-title').textContent    = d.device_type || 'تفاصيل الجهاز';
   document.getElementById('dm-serial').textContent   = d.serial_number    || '—';
@@ -945,39 +619,27 @@ async function openDeviceModal(d) {
   document.getElementById('dm-room').textContent     = d.room             || '—';
   document.getElementById('dm-seat').textContent     = [d.seat_number, d.seat_letter].filter(Boolean).join('') || '—';
   document.getElementById('dm-lastmove').textContent = d.last_movement ? new Date(d.last_movement).toLocaleString('ar-EG') : '—';
-  document.getElementById('dm-movedby').textContent  = d.moved_by         || '—';
+  document.getElementById('dm-movedby').textContent  = d.moved_by || '—';
   document.getElementById('dm-movements').innerHTML  = '<div class="no-mov">⏳ جاري التحميل...</div>';
   document.getElementById('device-modal').classList.add('show');
-
   try {
-    const res = await api('getDeviceMovements', {
-      spreadsheetId: currentUser.spreadsheetId,
-      serial: d.serial_number,
-      assetNumber: d.asset_number
-    });
+    const res = await api('getDeviceMovements', { spreadsheetId: currentUser.spreadsheetId, serial: d.serial_number, assetNumber: d.asset_number });
     if (res.success && res.data && res.data.length > 0) {
       let h = '<table class="mov-table"><thead><tr><th>التاريخ</th><th>بواسطة</th><th>من</th><th>إلى</th></tr></thead><tbody>';
       res.data.forEach(m => {
         const from = [m.from_location, m.from_floor, m.from_room].filter(Boolean).join(' / ');
-        const to   = [m.to_location,   m.to_floor,   m.to_room  ].filter(Boolean).join(' / ');
+        const to   = [m.to_location, m.to_floor, m.to_room].filter(Boolean).join(' / ');
         const dt   = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG') : '—';
         h += `<tr><td>${dt}</td><td>${m.moved_by||'—'}</td><td>${from||'—'}</td><td>${to||'—'}</td></tr>`;
       });
       h += '</tbody></table>';
       document.getElementById('dm-movements').innerHTML = h;
-    } else {
-      document.getElementById('dm-movements').innerHTML = '<div class="no-mov">لا توجد تحركات مسجلة</div>';
-    }
-  } catch(e) {
-    document.getElementById('dm-movements').innerHTML = '<div class="no-mov">خطأ في تحميل التحركات</div>';
-  }
+    } else { document.getElementById('dm-movements').innerHTML = '<div class="no-mov">لا توجد تحركات مسجلة</div>'; }
+  } catch(e) { document.getElementById('dm-movements').innerHTML = '<div class="no-mov">خطأ في تحميل التحركات</div>'; }
 }
 
 function closeDeviceModal() { document.getElementById('device-modal').classList.remove('show'); }
 
-// =============================================
-// ADD ITEM MODAL
-// =============================================
 function openAddModal(type, title, column) {
   addModalMeta = { type, column };
   document.getElementById('add-modal-title').textContent = title;
@@ -1000,9 +662,7 @@ async function confirmAdd() {
   const value = document.getElementById('add-modal-input').value.trim();
   if (!value) return;
   closeAddModal();
-
   const { type, column, prefix } = addModalMeta;
-
   if (type === 'room') {
     const floor = document.getElementById('m-' + prefix + 'Floor').value;
     try {
@@ -1014,36 +674,15 @@ async function confirmAdd() {
     } catch(e) { alert('خطأ في الإضافة: ' + e.message); }
     return;
   }
-
   try {
     await api('addSettingItem', { spreadsheetId: currentUser.spreadsheetId, column, value });
-    if (type === 'deviceType') {
-      if (!appSettings.deviceTypes) appSettings.deviceTypes = [];
-      appSettings.deviceTypes.push(value);
-      fillSelect('m-deviceType', appSettings.deviceTypes);
-      document.getElementById('m-deviceType').value = value;
-    } else if (type === 'department') {
-      if (!appSettings.departments) appSettings.departments = [];
-      appSettings.departments.push(value);
-      fillSelect('m-department', appSettings.departments);
-      document.getElementById('m-department').value = value;
-    } else if (type === 'site') {
-      if (!appSettings.sites) appSettings.sites = [];
-      appSettings.sites.push(value);
-      fillSelect('m-fromLocation', appSettings.sites);
-      fillSelect('m-toLocation',   appSettings.sites);
-      document.getElementById('m-toLocation').value = value;
-    }
+    if (type === 'deviceType') { if (!appSettings.deviceTypes) appSettings.deviceTypes = []; appSettings.deviceTypes.push(value); fillSelect('m-deviceType', appSettings.deviceTypes); document.getElementById('m-deviceType').value = value; }
+    else if (type === 'department') { if (!appSettings.departments) appSettings.departments = []; appSettings.departments.push(value); fillSelect('m-department', appSettings.departments); document.getElementById('m-department').value = value; }
+    else if (type === 'site') { if (!appSettings.sites) appSettings.sites = []; appSettings.sites.push(value); fillSelect('m-fromLocation', appSettings.sites); fillSelect('m-toLocation', appSettings.sites); document.getElementById('m-toLocation').value = value; }
   } catch(e) { alert('خطأ في الإضافة: ' + e.message); }
 }
 
-// =============================================
-// NAVIGATION HELPERS
-// =============================================
-function goHome() {
-  if (activeScanner) stopScanner();
-  showHome();
-}
+function goHome() { if (activeScanner) stopScanner(); showHome(); }
 </script>
 </body>
 </html>
