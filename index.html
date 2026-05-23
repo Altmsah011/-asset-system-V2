@@ -55,13 +55,15 @@ input:focus, select:focus { border-color: #4f46e5; }
 #scanner-container.show { display: block; }
 #reader { width: 100%; }
 .scanner-close-btn { width: 100%; padding: 10px; background: #dc2626; color: white; border: none; font-size: 14px; cursor: pointer; font-family: inherit; }
-
 /* DEVICES */
 .search-bar { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; gap: 8px; align-items: center; }
 .search-bar input { flex: 1; }
 .search-btn { padding: 10px 16px; background: #0891b2; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .filter-bar { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-.filter-bar-title { font-size: 12px; color: #888; margin-bottom: 8px; }
+.filter-bar-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.filter-bar-title { font-size: 12px; color: #888; }
+.sync-btn { padding: 5px 12px; background: #f59e0b; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.sync-btn:disabled { background: #fcd34d; cursor: not-allowed; }
 .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .filter-row select { flex: 1; min-width: 130px; }
 .filter-btn { padding: 9px 16px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
@@ -80,7 +82,6 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 .seat-badge { display: inline-block; background: #ede9fe; color: #5b21b6; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
 .empty-msg { text-align: center; padding: 3rem; color: #888; font-size: 14px; }
 .loading-msg { text-align: center; padding: 2rem; color: #4f46e5; font-size: 14px; }
-
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
 .modal.show { display: flex; }
 .modal-card { background: white; border-radius: 16px; width: 100%; max-width: 560px; overflow: hidden; margin: auto; }
@@ -259,9 +260,12 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
       <input type="text" id="d-search" placeholder="🔍 ابحث بـ Serial أو رقم الأصل في كل المواقع..." onkeydown="if(event.key==='Enter') doSearch()">
       <button class="search-btn" onclick="doSearch()">بحث</button>
     </div>
-    <!-- فلتر الدور والغرفة -->
+    <!-- فلتر + تزامن -->
     <div class="filter-bar">
-      <div class="filter-bar-title">📍 فلتر أجهزة موقعك الحالي</div>
+      <div class="filter-bar-top">
+        <div class="filter-bar-title">📍 فلتر أجهزة موقعك الحالي</div>
+        <button class="sync-btn" id="sync-btn" onclick="doSync()">🔄 تزامن الأجهزة</button>
+      </div>
       <div class="filter-row">
         <select id="d-floor" onchange="onDeviceFloorChange()"><option value="">كل الأدوار</option></select>
         <select id="d-room"><option value="">كل الغرف</option></select>
@@ -331,7 +335,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbwn91aA4Hi9kXGjhPeCmbM5N9BoeozGKIEP6xJ7Ap9X13h4c-wjfWhcUlXbZwQaanLN/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwRRpbB7NKlp5hDg9qElvw-cr2eAubXg6j-2-RFYHB37ut5K7xffgPRQojMCIaPCHar/exec';
 
 function api(action, params = {}) {
   return new Promise((resolve, reject) => {
@@ -356,7 +360,7 @@ function api(action, params = {}) {
     document.head.appendChild(script);
     setTimeout(function() {
       if (!done) { done = true; delete window[cbName]; if (script.parentNode) script.parentNode.removeChild(script); reject(new Error('انتهت مهلة الاتصال')); }
-    }, 30000);
+    }, 60000);
   });
 }
 
@@ -486,13 +490,20 @@ async function submitMovement() {
   btn.disabled = true; btn.textContent = 'جاري الحفظ...'; hideMovError();
   const movementData = {
     serial, assetNumber: asset,
-    deviceType: document.getElementById('m-deviceType').value, department: document.getElementById('m-department').value,
-    fromLocation: document.getElementById('m-fromLocation').value, fromFloor: document.getElementById('m-fromFloor').value,
-    fromRoom: document.getElementById('m-fromRoom').value, fromSeatNum: document.getElementById('m-fromSeatNum').value,
-    fromSeatLetter: document.getElementById('m-fromSeatLetter').value, toLocation: document.getElementById('m-toLocation').value,
-    toFloor: document.getElementById('m-toFloor').value, toRoom: document.getElementById('m-toRoom').value,
-    toSeatNum: document.getElementById('m-toSeatNum').value, toSeatLetter: document.getElementById('m-toSeatLetter').value,
-    ticketNumber: document.getElementById('m-ticket').value, notes: document.getElementById('m-notes').value,
+    deviceType: document.getElementById('m-deviceType').value,
+    department: document.getElementById('m-department').value,
+    fromLocation: document.getElementById('m-fromLocation').value,
+    fromFloor: document.getElementById('m-fromFloor').value,
+    fromRoom: document.getElementById('m-fromRoom').value,
+    fromSeatNum: document.getElementById('m-fromSeatNum').value,
+    fromSeatLetter: document.getElementById('m-fromSeatLetter').value,
+    toLocation: document.getElementById('m-toLocation').value,
+    toFloor: document.getElementById('m-toFloor').value,
+    toRoom: document.getElementById('m-toRoom').value,
+    toSeatNum: document.getElementById('m-toSeatNum').value,
+    toSeatLetter: document.getElementById('m-toSeatLetter').value,
+    ticketNumber: document.getElementById('m-ticket').value,
+    notes: document.getElementById('m-notes').value,
   };
   try {
     const res = await api('saveMovement', { spreadsheetId: currentUser.spreadsheetId, locationName: currentUser.locationName, movementData, userFullName: currentUser.fullName });
@@ -542,12 +553,11 @@ function stopScanner() {
 // ===== DEVICES PAGE =====
 async function openDevicesPage() {
   showPage('page-devices');
-  // ملي فلتر الدور
   const floorSel = document.getElementById('d-floor');
   floorSel.innerHTML = '<option value="">كل الأدوار</option>';
   (appSettings.floors || []).forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; floorSel.appendChild(o); });
   document.getElementById('d-room').innerHTML = '<option value="">كل الغرف</option>';
-  // جيب آخر 50 حركة
+  document.getElementById('d-search').value = '';
   await showRecent();
 }
 
@@ -555,14 +565,14 @@ async function showRecent() {
   document.getElementById('d-floor').value = '';
   document.getElementById('d-room').innerHTML = '<option value="">كل الغرف</option>';
   document.getElementById('d-search').value = '';
-  setTableLabel('⏳ آخر 50 حركة نقل في موقعك');
+  setTableLabel('⏳ جاري التحميل...');
   showTableLoading();
   try {
     const res = await api('getRecentMovements', { spreadsheetId: currentUser.spreadsheetId });
     const rows = (res.success && res.data) ? res.data : [];
     setTableLabel('🕐 آخر ' + rows.length + ' حركة نقل في موقعك');
     renderMovementsTable(rows);
-  } catch(e) { showTableEmpty(); }
+  } catch(e) { setTableLabel('خطأ في التحميل'); showTableEmpty(); }
 }
 
 function onDeviceFloorChange() {
@@ -579,70 +589,73 @@ async function applyFilter() {
   const room  = document.getElementById('d-room').value;
   if (!floor && !room) { await showRecent(); return; }
   document.getElementById('d-search').value = '';
-  const label = (floor ? floor : '') + (room ? ' / ' + room : '');
-  setTableLabel('📍 أجهزة: ' + label);
+  const label = (floor || '') + (room ? ' / ' + room : '');
+  setTableLabel('⏳ جاري التحميل...');
   showTableLoading();
   try {
     const res = await api('getDevices', { spreadsheetId: currentUser.spreadsheetId, floor, room });
     const rows = (res.success && res.data) ? res.data : [];
-    setTableLabel('📍 أجهزة ' + label + ' (' + rows.length + ')');
+    setTableLabel('📍 أجهزة: ' + label + ' (' + rows.length + ')');
     renderDevicesTable(rows);
-  } catch(e) { showTableEmpty(); }
+  } catch(e) { setTableLabel('خطأ في التحميل'); showTableEmpty(); }
 }
 
 async function doSearch() {
   const query = document.getElementById('d-search').value.trim();
   if (!query) { await showRecent(); return; }
-  setTableLabel('🔍 نتائج البحث عن: ' + query);
+  setTableLabel('⏳ جاري البحث...');
   showTableLoading();
   try {
-    const res = await api('searchAllDevices', { query });
+    const res = await api('searchAllDevices', { query, spreadsheetId: currentUser.spreadsheetId });
     const rows = (res.success && res.data) ? res.data : [];
-    setTableLabel('🔍 نتائج البحث: ' + rows.length + ' جهاز');
+    setTableLabel('🔍 نتائج البحث عن "' + query + '": ' + rows.length + ' جهاز');
     renderDevicesTable(rows);
-  } catch(e) { showTableEmpty(); }
+  } catch(e) { setTableLabel('خطأ في البحث'); showTableEmpty(); }
 }
 
-// رسم جدول الحركات (آخر 50 حركة)
+// تزامن الأجهزة
+async function doSync() {
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true; btn.textContent = '⏳ جاري التزامن...';
+  try {
+    const res = await api('syncAllBranches', {});
+    if (res.success) {
+      alert('✅ ' + res.message);
+    } else {
+      alert('❌ خطأ: ' + res.message);
+    }
+  } catch(e) { alert('❌ خطأ: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = '🔄 تزامن الأجهزة'; }
+}
+
+// رسم جدول الحركات
 function renderMovementsTable(rows) {
-  updateStats(rows, 'movement');
+  updateStats(rows);
   if (rows.length === 0) { showTableEmpty(); return; }
   const tbody = document.getElementById('d-body');
-  const table = document.getElementById('d-table');
   document.getElementById('d-empty').style.display = 'none';
-  table.style.display = 'table';
+  document.getElementById('d-loading').style.display = 'none';
+  document.getElementById('d-table').style.display = 'table';
   tbody.innerHTML = '';
   rows.forEach((m, idx) => {
-    const to = [m.to_location, m.to_floor, m.to_room].filter(Boolean).join(' / ');
     const seat = [m.to_seat_number, m.to_seat_letter].filter(Boolean).join('');
     const dt = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG') : '—';
     const tr = document.createElement('tr');
     tr.className = 'device-row';
-    tr.onclick = () => openDeviceModalBySerial(m.serial_number, m.asset_number);
-    tr.innerHTML = `
-      <td>${idx+1}</td>
-      <td>${m.serial_number||'—'}</td>
-      <td>${m.asset_number||'—'}</td>
-      <td>${m.device_type||'—'}</td>
-      <td>${m.department||'—'}</td>
-      <td>${m.to_location||'—'}</td>
-      <td>${m.to_floor||'—'}</td>
-      <td>${m.to_room||'—'}</td>
-      <td>${seat ? '<span class="seat-badge">'+seat+'</span>' : '—'}</td>
-      <td>${dt}</td>
-      <td>${m.moved_by||'—'}</td>`;
+    tr.onclick = () => openDeviceModalByQuery(m.serial_number || m.asset_number);
+    tr.innerHTML = `<td>${idx+1}</td><td>${m.serial_number||'—'}</td><td>${m.asset_number||'—'}</td><td>${m.device_type||'—'}</td><td>${m.department||'—'}</td><td>${m.to_location||'—'}</td><td>${m.to_floor||'—'}</td><td>${m.to_room||'—'}</td><td>${seat?'<span class="seat-badge">'+seat+'</span>':'—'}</td><td>${dt}</td><td>${m.moved_by||'—'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// رسم جدول الأجهزة (فلتر أو بحث)
+// رسم جدول الأجهزة
 function renderDevicesTable(rows) {
-  updateStats(rows, 'device');
+  updateStats(rows);
   if (rows.length === 0) { showTableEmpty(); return; }
   const tbody = document.getElementById('d-body');
-  const table = document.getElementById('d-table');
   document.getElementById('d-empty').style.display = 'none';
-  table.style.display = 'table';
+  document.getElementById('d-loading').style.display = 'none';
+  document.getElementById('d-table').style.display = 'table';
   tbody.innerHTML = '';
   rows.forEach((d, idx) => {
     const seat = [d.seat_number, d.seat_letter].filter(Boolean).join('');
@@ -650,47 +663,31 @@ function renderDevicesTable(rows) {
     const tr = document.createElement('tr');
     tr.className = 'device-row';
     tr.onclick = () => openDeviceModal(d);
-    tr.innerHTML = `
-      <td>${idx+1}</td>
-      <td>${d.serial_number||'—'}</td>
-      <td>${d.asset_number||'—'}</td>
-      <td>${d.device_type||'—'}</td>
-      <td>${d.department||'—'}</td>
-      <td>${d.current_location||'—'}</td>
-      <td>${d.floor||'—'}</td>
-      <td>${d.room||'—'}</td>
-      <td>${seat ? '<span class="seat-badge">'+seat+'</span>' : '—'}</td>
-      <td>${dt}</td>
-      <td>${d.moved_by||'—'}</td>`;
+    tr.innerHTML = `<td>${idx+1}</td><td>${d.serial_number||'—'}</td><td>${d.asset_number||'—'}</td><td>${d.device_type||'—'}</td><td>${d.department||'—'}</td><td>${d.current_location||'—'}</td><td>${d.floor||'—'}</td><td>${d.room||'—'}</td><td>${seat?'<span class="seat-badge">'+seat+'</span>':'—'}</td><td>${dt}</td><td>${d.moved_by||'—'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-function updateStats(rows, type) {
-  const statsBar = document.getElementById('stats-bar');
+function updateStats(rows) {
   const typeCounts = {};
-  rows.forEach(r => {
-    const t = (type === 'movement' ? r.device_type : r.device_type) || 'غير محدد';
-    typeCounts[t] = (typeCounts[t]||0)+1;
-  });
+  rows.forEach(r => { const t = r.device_type || 'غير محدد'; typeCounts[t] = (typeCounts[t]||0)+1; });
   let html = `<div class="stat-card"><span class="stat-num">${rows.length}</span><span class="stat-label">إجمالي</span></div>`;
   Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => {
     html += `<div class="stat-card"><span class="stat-num">${c}</span><span class="stat-label">${t}</span></div>`;
   });
-  statsBar.innerHTML = html;
+  document.getElementById('stats-bar').innerHTML = html;
 }
 
 function showTableLoading() {
   document.getElementById('d-loading').style.display = 'block';
-  document.getElementById('d-table').style.display = 'none';
-  document.getElementById('d-empty').style.display = 'none';
+  document.getElementById('d-table').style.display   = 'none';
+  document.getElementById('d-empty').style.display   = 'none';
   document.getElementById('stats-bar').innerHTML = '';
 }
 function showTableEmpty() {
   document.getElementById('d-loading').style.display = 'none';
-  document.getElementById('d-table').style.display = 'none';
-  document.getElementById('d-empty').style.display = 'block';
-  document.getElementById('stats-bar').innerHTML = '';
+  document.getElementById('d-table').style.display   = 'none';
+  document.getElementById('d-empty').style.display   = 'block';
 }
 function setTableLabel(txt) {
   document.getElementById('d-loading').style.display = 'none';
@@ -698,13 +695,11 @@ function setTableLabel(txt) {
 }
 
 // ===== DEVICE MODAL =====
-async function openDeviceModalBySerial(serial, asset) {
-  // بنفتح المودال بس بنجيب بيانات الجهاز من البحث
+async function openDeviceModalByQuery(query) {
+  if (!query) return;
   try {
-    const res = await api('searchAllDevices', { query: serial || asset });
-    if (res.success && res.data && res.data.length > 0) {
-      openDeviceModal(res.data[0]);
-    }
+    const res = await api('searchAllDevices', { query: query.toString(), spreadsheetId: currentUser.spreadsheetId });
+    if (res.success && res.data && res.data.length > 0) openDeviceModal(res.data[0]);
   } catch(e) {}
 }
 
