@@ -55,14 +55,13 @@ input:focus, select:focus { border-color: #4f46e5; }
 #scanner-container.show { display: block; }
 #reader { width: 100%; }
 .scanner-close-btn { width: 100%; padding: 10px; background: #dc2626; color: white; border: none; font-size: 14px; cursor: pointer; font-family: inherit; }
-/* DEVICES */
 .search-bar { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; gap: 8px; align-items: center; }
 .search-bar input { flex: 1; }
 .search-btn { padding: 10px 16px; background: #0891b2; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .filter-bar { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 .filter-bar-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .filter-bar-title { font-size: 12px; color: #888; }
-.sync-btn { padding: 5px 12px; background: #f59e0b; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.sync-btn { padding: 5px 12px; background: #f59e0b; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; }
 .sync-btn:disabled { background: #fcd34d; cursor: not-allowed; }
 .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .filter-row select { flex: 1; min-width: 130px; }
@@ -82,6 +81,21 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 .seat-badge { display: inline-block; background: #ede9fe; color: #5b21b6; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
 .empty-msg { text-align: center; padding: 3rem; color: #888; font-size: 14px; }
 .loading-msg { text-align: center; padding: 2rem; color: #4f46e5; font-size: 14px; }
+/* USERS PAGE */
+.users-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.add-user-btn { padding: 10px 18px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; }
+.user-card { background: white; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: .75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.user-card-info { flex: 1; }
+.user-card-name { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+.user-card-meta { font-size: 12px; color: #888; margin-top: 3px; }
+.user-card-actions { display: flex; gap: 8px; }
+.edit-btn { padding: 6px 12px; background: #ede9fe; color: #4f46e5; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; }
+.deactivate-btn { padding: 6px 12px; background: #fef2f2; color: #dc2626; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; }
+.status-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.status-active { background: #f0fdf4; color: #16a34a; }
+.status-inactive { background: #fef2f2; color: #dc2626; }
+.role-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #ede9fe; color: #5b21b6; margin-right: 6px; }
+/* MODAL */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
 .modal.show { display: flex; }
 .modal-card { background: white; border-radius: 16px; width: 100%; max-width: 560px; overflow: hidden; margin: auto; }
@@ -100,10 +114,10 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 .mov-table td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
 .mov-table tr:last-child td { border-bottom: none; }
 .no-mov { text-align: center; padding: 1rem; color: #888; font-size: 13px; }
-.add-modal-card { max-width: 340px; }
+.add-modal-card { max-width: 440px; }
 .add-modal-input { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 1rem; font-family: inherit; }
 .add-modal-input:focus { border-color: #4f46e5; }
-.modal-btns { display: flex; gap: 8px; }
+.modal-btns { display: flex; gap: 8px; margin-top: .5rem; }
 .modal-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-family: inherit; }
 .btn-ok { background: #4f46e5; color: white; }
 .btn-cancel { background: #f3f4f6; color: #666; }
@@ -111,6 +125,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
   .menu-grid { grid-template-columns: 1fr 1fr; gap: .75rem; }
   .menu-card { padding: 1.25rem .75rem; }
   .detail-grid { grid-template-columns: 1fr; }
+  .user-card { flex-direction: column; align-items: flex-start; }
 }
 </style>
 </head>
@@ -148,7 +163,7 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
   </div>
   <div class="content" style="padding-top:2rem">
     <div class="location-badge">📍 <span id="home-location"></span></div>
-    <div class="menu-grid">
+    <div class="menu-grid" id="home-menu">
       <div class="menu-card" onclick="openMovementPage()">
         <span class="card-icon">🔄</span>
         <h3>تسجيل حركة نقل</h3>
@@ -158,6 +173,11 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
         <span class="card-icon">🖥️</span>
         <h3>عرض الأجهزة</h3>
         <p>آخر الحركات والبحث</p>
+      </div>
+      <div class="menu-card admin-only" onclick="openUsersPage()" style="display:none">
+        <span class="card-icon">👥</span>
+        <h3>إدارة المستخدمين</h3>
+        <p>إضافة وتعديل المستخدمين</p>
       </div>
     </div>
   </div>
@@ -255,12 +275,10 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
     </div>
   </div>
   <div class="content">
-    <!-- بحث في كل المواقع -->
     <div class="search-bar">
       <input type="text" id="d-search" placeholder="🔍 ابحث بـ Serial أو رقم الأصل في كل المواقع..." onkeydown="if(event.key==='Enter') doSearch()">
       <button class="search-btn" onclick="doSearch()">بحث</button>
     </div>
-    <!-- فلتر + تزامن -->
     <div class="filter-bar">
       <div class="filter-bar-top">
         <div class="filter-bar-title">📍 فلتر أجهزة موقعك الحالي</div>
@@ -280,15 +298,28 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
       <div class="empty-msg" id="d-empty" style="display:none">لا توجد نتائج</div>
       <table id="d-table" style="display:none">
         <thead>
-          <tr>
-            <th>#</th><th>Serial</th><th>رقم الأصل</th><th>نوع الجهاز</th>
-            <th>الإدارة</th><th>الموقع</th><th>الدور</th><th>الغرفة</th>
-            <th>Seat</th><th>التاريخ / آخر تحرك</th><th>بواسطة</th>
-          </tr>
+          <tr><th>#</th><th>Serial</th><th>رقم الأصل</th><th>نوع الجهاز</th><th>الإدارة</th><th>الموقع</th><th>الدور</th><th>الغرفة</th><th>Seat</th><th>التاريخ</th><th>بواسطة</th></tr>
         </thead>
         <tbody id="d-body"></tbody>
       </table>
     </div>
+  </div>
+</div>
+
+<!-- USERS PAGE -->
+<div id="page-users" class="page">
+  <div class="navbar">
+    <div class="navbar-left">
+      <button class="back-btn" onclick="goHome()">→ رجوع</button>
+      <h2>👥 إدارة المستخدمين</h2>
+    </div>
+  </div>
+  <div class="content">
+    <div class="users-toolbar">
+      <div style="font-size:13px;color:#888" id="users-count">جاري التحميل...</div>
+      <button class="add-user-btn" onclick="openUserForm(null)">+ إضافة مستخدم</button>
+    </div>
+    <div id="users-list"><div class="loading-msg">⏳ جاري التحميل...</div></div>
   </div>
 </div>
 
@@ -320,7 +351,53 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
   </div>
 </div>
 
-<!-- ADD MODAL -->
+<!-- USER FORM MODAL -->
+<div class="modal" id="user-modal">
+  <div class="modal-card add-modal-card">
+    <div class="modal-header"><h3 id="user-modal-title">إضافة مستخدم</h3><button class="modal-close" onclick="closeUserModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>اسم المستخدم (username)</label>
+        <input type="text" class="add-modal-input" id="u-username" placeholder="مثال: ahmed_maadi">
+      </div>
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <input type="text" class="add-modal-input" id="u-fullname" placeholder="مثال: أحمد محمد">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور <span id="u-pass-hint" style="color:#888;font-size:11px"></span></label>
+        <input type="password" class="add-modal-input" id="u-password" placeholder="اكتب كلمة المرور">
+      </div>
+      <div class="form-group">
+        <label>الدور</label>
+        <select class="add-modal-input" id="u-role">
+          <option value="user">مستخدم عادي</option>
+          <option value="admin">مدير (Admin)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>الموقع</label>
+        <select class="add-modal-input" id="u-location">
+          <option value="">-- اختر موقع --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>الحالة</label>
+        <select class="add-modal-input" id="u-status">
+          <option value="active">مفعّل</option>
+          <option value="inactive">موقف</option>
+        </select>
+      </div>
+      <div class="error-box" id="u-error"></div>
+      <div class="modal-btns">
+        <button class="btn-ok" onclick="saveUserForm()">💾 حفظ</button>
+        <button class="btn-cancel" onclick="closeUserModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ITEM MODAL -->
 <div class="modal" id="add-modal">
   <div class="modal-card add-modal-card">
     <div class="modal-header"><h3 id="add-modal-title">إضافة جديد</h3><button class="modal-close" onclick="closeAddModal()">✕</button></div>
@@ -335,7 +412,15 @@ tr.device-row:hover td { background: #f8f7ff; cursor: pointer; }
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycby20Pi7KRO5LDHIGKN14f8GtNvUT8XfO7i3UxM4wul_HbEiShAnibfKMzLKLRkvyNwF/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwb2STBADhrQOq8nZhoDMOlBw7b0x_MAU8VAF-zqkJpnjtRu_rdcneQ3_TLIIdMIxG0/exec';
+
+// الـ branches من الـ Config — نفس الأسماء بالظبط
+const BRANCHES = {
+  'Maadi':         '1yUYGs3BS0XNVJmE57HBOE_CY39upFPXbIAA1nGMkZhY',
+  'Smart Village': '12oBgaRDSiZzWGNm07HlXxJ2c1UfmzPMS0tYrsJG_z0E',
+  'Nasr City':     '1tGG4CWmKtse6sueGEHJQMsjlAkvd1hSFKfrXFxA-z7g',
+  'Dokki':         '1ooq_ezbeIMyYwjBSW3k3YHRjLt-JG6TE7eAqb6btoXw'
+};
 
 function api(action, params = {}) {
   return new Promise((resolve, reject) => {
@@ -367,6 +452,7 @@ function api(action, params = {}) {
 let currentUser = null, appSettings = {};
 let autoFilled = false, lastSerial = '', lastAsset = '', lookupTimer = null;
 let activeScanner = null, activeScanField = null, addModalMeta = {};
+let editingUsername = null;
 
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -384,8 +470,11 @@ async function doLogin() {
   hideLoginError();
   try {
     const res = await api('login', { username, password });
-    if (res.success) { currentUser = res.user; await loadSettings(); showHome(); }
-    else showLoginError(res.message || 'اسم المستخدم أو كلمة المرور غلط');
+    if (res.success) {
+      currentUser = res.user;
+      await loadSettings();
+      showHome();
+    } else showLoginError(res.message || 'اسم المستخدم أو كلمة المرور غلط');
   } catch(e) { showLoginError('حدث خطأ في الاتصال: ' + e.message); }
   finally { btn.disabled = false; btn.textContent = 'دخول'; }
 }
@@ -400,6 +489,10 @@ function doLogout() {
 function showHome() {
   document.getElementById('nav-username').textContent = currentUser.fullName;
   document.getElementById('home-location').textContent = currentUser.locationName;
+  // اظهر كارت المستخدمين للـ admin بس
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+  });
   showPage('page-home');
 }
 async function loadSettings() {
@@ -490,20 +583,13 @@ async function submitMovement() {
   btn.disabled = true; btn.textContent = 'جاري الحفظ...'; hideMovError();
   const movementData = {
     serial, assetNumber: asset,
-    deviceType: document.getElementById('m-deviceType').value,
-    department: document.getElementById('m-department').value,
-    fromLocation: document.getElementById('m-fromLocation').value,
-    fromFloor: document.getElementById('m-fromFloor').value,
-    fromRoom: document.getElementById('m-fromRoom').value,
-    fromSeatNum: document.getElementById('m-fromSeatNum').value,
-    fromSeatLetter: document.getElementById('m-fromSeatLetter').value,
-    toLocation: document.getElementById('m-toLocation').value,
-    toFloor: document.getElementById('m-toFloor').value,
-    toRoom: document.getElementById('m-toRoom').value,
-    toSeatNum: document.getElementById('m-toSeatNum').value,
-    toSeatLetter: document.getElementById('m-toSeatLetter').value,
-    ticketNumber: document.getElementById('m-ticket').value,
-    notes: document.getElementById('m-notes').value,
+    deviceType: document.getElementById('m-deviceType').value, department: document.getElementById('m-department').value,
+    fromLocation: document.getElementById('m-fromLocation').value, fromFloor: document.getElementById('m-fromFloor').value,
+    fromRoom: document.getElementById('m-fromRoom').value, fromSeatNum: document.getElementById('m-fromSeatNum').value,
+    fromSeatLetter: document.getElementById('m-fromSeatLetter').value, toLocation: document.getElementById('m-toLocation').value,
+    toFloor: document.getElementById('m-toFloor').value, toRoom: document.getElementById('m-toRoom').value,
+    toSeatNum: document.getElementById('m-toSeatNum').value, toSeatLetter: document.getElementById('m-toSeatLetter').value,
+    ticketNumber: document.getElementById('m-ticket').value, notes: document.getElementById('m-notes').value,
   };
   try {
     const res = await api('saveMovement', { spreadsheetId: currentUser.spreadsheetId, locationName: currentUser.locationName, movementData, userFullName: currentUser.fullName });
@@ -511,7 +597,7 @@ async function submitMovement() {
       document.getElementById('m-success').style.display = 'block';
       autoFilled = false; lastSerial = ''; lastAsset = '';
       setTimeout(() => { document.getElementById('m-success').style.display = 'none'; resetMovementForm(); }, 2000);
-    } else showMovError(res.message || 'حدث خطأ في الحفظ');
+    } else showMovError(res.message || 'حدث خطأ');
   } catch(e) { showMovError('حدث خطأ: ' + e.message); }
   finally { btn.disabled = false; btn.textContent = '✅ تسجيل الحركة'; }
 }
@@ -550,7 +636,7 @@ function stopScanner() {
   }
 }
 
-// ===== DEVICES PAGE =====
+// ===== DEVICES =====
 async function openDevicesPage() {
   showPage('page-devices');
   const floorSel = document.getElementById('d-floor');
@@ -560,7 +646,6 @@ async function openDevicesPage() {
   document.getElementById('d-search').value = '';
   await showRecent();
 }
-
 async function showRecent() {
   document.getElementById('d-floor').value = '';
   document.getElementById('d-room').innerHTML = '<option value="">كل الغرف</option>';
@@ -574,7 +659,6 @@ async function showRecent() {
     renderMovementsTable(rows);
   } catch(e) { setTableLabel('خطأ في التحميل'); showTableEmpty(); }
 }
-
 function onDeviceFloorChange() {
   const floor = document.getElementById('d-floor').value;
   const roomSel = document.getElementById('d-room');
@@ -583,7 +667,6 @@ function onDeviceFloorChange() {
     const o = document.createElement('option'); o.value = r.name; o.textContent = r.name; roomSel.appendChild(o);
   });
 }
-
 async function applyFilter() {
   const floor = document.getElementById('d-floor').value;
   const room  = document.getElementById('d-room').value;
@@ -597,9 +680,8 @@ async function applyFilter() {
     const rows = (res.success && res.data) ? res.data : [];
     setTableLabel('📍 أجهزة: ' + label + ' (' + rows.length + ')');
     renderDevicesTable(rows);
-  } catch(e) { setTableLabel('خطأ في التحميل'); showTableEmpty(); }
+  } catch(e) { setTableLabel('خطأ'); showTableEmpty(); }
 }
-
 async function doSearch() {
   const query = document.getElementById('d-search').value.trim();
   if (!query) { await showRecent(); return; }
@@ -608,27 +690,19 @@ async function doSearch() {
   try {
     const res = await api('searchAllDevices', { query, spreadsheetId: currentUser.spreadsheetId });
     const rows = (res.success && res.data) ? res.data : [];
-    setTableLabel('🔍 نتائج البحث عن "' + query + '": ' + rows.length + ' جهاز');
+    setTableLabel('🔍 نتائج: "' + query + '" — ' + rows.length + ' جهاز');
     renderDevicesTable(rows);
   } catch(e) { setTableLabel('خطأ في البحث'); showTableEmpty(); }
 }
-
-// تزامن الأجهزة
 async function doSync() {
   const btn = document.getElementById('sync-btn');
   btn.disabled = true; btn.textContent = '⏳ جاري التزامن...';
   try {
     const res = await api('syncAllBranches', {});
-    if (res.success) {
-      alert('✅ ' + res.message);
-    } else {
-      alert('❌ خطأ: ' + res.message);
-    }
+    alert(res.success ? res.message : '❌ خطأ: ' + res.message);
   } catch(e) { alert('❌ خطأ: ' + e.message); }
   finally { btn.disabled = false; btn.textContent = '🔄 تزامن الأجهزة'; }
 }
-
-// رسم جدول الحركات
 function renderMovementsTable(rows) {
   updateStats(rows);
   if (rows.length === 0) { showTableEmpty(); return; }
@@ -647,8 +721,6 @@ function renderMovementsTable(rows) {
     tbody.appendChild(tr);
   });
 }
-
-// رسم جدول الأجهزة
 function renderDevicesTable(rows) {
   updateStats(rows);
   if (rows.length === 0) { showTableEmpty(); return; }
@@ -667,17 +739,13 @@ function renderDevicesTable(rows) {
     tbody.appendChild(tr);
   });
 }
-
 function updateStats(rows) {
   const typeCounts = {};
   rows.forEach(r => { const t = r.device_type || 'غير محدد'; typeCounts[t] = (typeCounts[t]||0)+1; });
   let html = `<div class="stat-card"><span class="stat-num">${rows.length}</span><span class="stat-label">إجمالي</span></div>`;
-  Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => {
-    html += `<div class="stat-card"><span class="stat-num">${c}</span><span class="stat-label">${t}</span></div>`;
-  });
+  Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => { html += `<div class="stat-card"><span class="stat-num">${c}</span><span class="stat-label">${t}</span></div>`; });
   document.getElementById('stats-bar').innerHTML = html;
 }
-
 function showTableLoading() {
   document.getElementById('d-loading').style.display = 'block';
   document.getElementById('d-table').style.display   = 'none';
@@ -702,7 +770,6 @@ async function openDeviceModalByQuery(query) {
     if (res.success && res.data && res.data.length > 0) openDeviceModal(res.data[0]);
   } catch(e) {}
 }
-
 async function openDeviceModal(d) {
   document.getElementById('dm-title').textContent    = d.device_type || 'تفاصيل الجهاز';
   document.getElementById('dm-serial').textContent   = d.serial_number    || '—';
@@ -730,9 +797,127 @@ async function openDeviceModal(d) {
       h += '</tbody></table>';
       document.getElementById('dm-movements').innerHTML = h;
     } else { document.getElementById('dm-movements').innerHTML = '<div class="no-mov">لا توجد تحركات مسجلة</div>'; }
-  } catch(e) { document.getElementById('dm-movements').innerHTML = '<div class="no-mov">خطأ في تحميل التحركات</div>'; }
+  } catch(e) { document.getElementById('dm-movements').innerHTML = '<div class="no-mov">خطأ في التحميل</div>'; }
 }
 function closeDeviceModal() { document.getElementById('device-modal').classList.remove('show'); }
+
+// ===== USERS PAGE =====
+async function openUsersPage() {
+  if (currentUser.role !== 'admin') return;
+  showPage('page-users');
+  document.getElementById('users-list').innerHTML = '<div class="loading-msg">⏳ جاري التحميل...</div>';
+  try {
+    const res = await api('getUsers', {});
+    if (res.success) renderUsersList(res.data);
+    else document.getElementById('users-list').innerHTML = '<div class="empty-msg">خطأ في التحميل</div>';
+  } catch(e) { document.getElementById('users-list').innerHTML = '<div class="empty-msg">خطأ في الاتصال</div>'; }
+}
+
+function renderUsersList(users) {
+  document.getElementById('users-count').textContent = users.length + ' مستخدم';
+  if (users.length === 0) { document.getElementById('users-list').innerHTML = '<div class="empty-msg">لا يوجد مستخدمين</div>'; return; }
+  let html = '';
+  users.forEach(u => {
+    const statusClass = u.status === 'active' ? 'status-active' : 'status-inactive';
+    const statusText  = u.status === 'active' ? 'مفعّل' : 'موقف';
+    const roleText    = u.role === 'admin' ? 'مدير' : 'مستخدم';
+    html += `
+      <div class="user-card">
+        <div class="user-card-info">
+          <div class="user-card-name">${u.fullName || '—'}</div>
+          <div class="user-card-meta">
+            <span class="role-badge">${roleText}</span>
+            <span class="status-badge ${statusClass}">${statusText}</span>
+            &nbsp;|&nbsp; @${u.username} &nbsp;|&nbsp; 📍 ${u.locationName || '—'}
+          </div>
+        </div>
+        <div class="user-card-actions">
+          <button class="edit-btn" onclick="openUserForm(${JSON.stringify(u).replace(/"/g,'&quot;')})">✏️ تعديل</button>
+          ${u.status === 'active'
+            ? `<button class="deactivate-btn" onclick="toggleUser('${u.username}','inactive')">🚫 إيقاف</button>`
+            : `<button class="edit-btn" onclick="toggleUser('${u.username}','active')" style="background:#f0fdf4;color:#16a34a">✅ تفعيل</button>`
+          }
+        </div>
+      </div>`;
+  });
+  document.getElementById('users-list').innerHTML = html;
+}
+
+function openUserForm(user) {
+  editingUsername = user ? user.username : null;
+  document.getElementById('user-modal-title').textContent = user ? 'تعديل مستخدم' : 'إضافة مستخدم جديد';
+  document.getElementById('u-username').value  = user ? user.username  : '';
+  document.getElementById('u-fullname').value  = user ? user.fullName  : '';
+  document.getElementById('u-password').value  = '';
+  document.getElementById('u-role').value      = user ? user.role      : 'user';
+  document.getElementById('u-status').value    = user ? user.status    : 'active';
+  document.getElementById('u-username').disabled = !!user;
+  document.getElementById('u-pass-hint').textContent = user ? '(اتركها فاضية لو مش عايز تغيرها)' : '';
+  document.getElementById('u-error').style.display = 'none';
+
+  // ملي قائمة المواقع
+  const locSel = document.getElementById('u-location');
+  locSel.innerHTML = '<option value="">-- اختر موقع --</option>';
+  Object.entries(BRANCHES).forEach(([name, id]) => {
+    const o = document.createElement('option');
+    o.value = id; o.textContent = name;
+    if (user && user.spreadsheetId === id) o.selected = true;
+    locSel.appendChild(o);
+  });
+
+  document.getElementById('user-modal').classList.add('show');
+}
+
+function closeUserModal() { document.getElementById('user-modal').classList.remove('show'); }
+
+async function saveUserForm() {
+  const username     = document.getElementById('u-username').value.trim();
+  const fullName     = document.getElementById('u-fullname').value.trim();
+  const password     = document.getElementById('u-password').value.trim();
+  const role         = document.getElementById('u-role').value;
+  const spreadsheetId = document.getElementById('u-location').value;
+  const status       = document.getElementById('u-status').value;
+
+  const errEl = document.getElementById('u-error');
+  errEl.style.display = 'none';
+
+  if (!username) { errEl.textContent = 'اكتب اسم المستخدم'; errEl.style.display = 'block'; return; }
+  if (!fullName) { errEl.textContent = 'اكتب الاسم الكامل'; errEl.style.display = 'block'; return; }
+  if (!editingUsername && !password) { errEl.textContent = 'اكتب كلمة المرور'; errEl.style.display = 'block'; return; }
+  if (!spreadsheetId) { errEl.textContent = 'اختر الموقع'; errEl.style.display = 'block'; return; }
+
+  // جيب اسم الموقع من الـ ID
+  const locationName = Object.entries(BRANCHES).find(([n, id]) => id === spreadsheetId)?.[0] || '';
+
+  const userData = { username, fullName, password, role, spreadsheetId, locationName, status };
+  const isNew = !editingUsername;
+
+  try {
+    const res = await api('saveUser', { userData, isNew });
+    if (res.success) {
+      closeUserModal();
+      await openUsersPage();
+    } else {
+      errEl.textContent = res.message || 'حدث خطأ';
+      errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = 'خطأ في الاتصال: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function toggleUser(username, newStatus) {
+  const confirmMsg = newStatus === 'inactive' ? 'هتوقف المستخدم ' + username + '؟' : 'هتفعّل المستخدم ' + username + '؟';
+  if (!confirm(confirmMsg)) return;
+  try {
+    const res = newStatus === 'inactive'
+      ? await api('deleteUser', { username })
+      : await api('saveUser', { userData: { username, status: 'active' }, isNew: false });
+    if (res.success) await openUsersPage();
+    else alert('خطأ: ' + res.message);
+  } catch(e) { alert('خطأ: ' + e.message); }
+}
 
 // ===== ADD MODAL =====
 function openAddModal(type, title, column) {
