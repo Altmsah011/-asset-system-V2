@@ -1,0 +1,22 @@
+{
+  "name": "نظام تتبع الأصول",
+  "short_name": "ATS",
+  "description": "نظام إدارة وتتبع الأصول المتحركة",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/googlesamples/web-fundamentals/master/fundamentals/engage-and-retain/push-notifications/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/googlesamples/web-fundamentals/master/fundamentals/engage-and-retain/push-notifications/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
