@@ -964,7 +964,7 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
     }catch(e){}
   });
 
-  if(!serial) serialInp.focus();
+  if(!serial) row.querySelector('.bulk-serial-inp').focus();
 }
 
 function openBulkModal(){
