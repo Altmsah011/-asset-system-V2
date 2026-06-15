@@ -445,13 +445,14 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
       <div class="form-group">
         <label>بيانات الأجهزة — كل صف: Serial | رقم Seat | حرف Seat</label>
         <div class="bulk-grid-header">
-          <span>Serial Number</span><span>رقم Seat</span><span>حرف Seat</span>
+          <span>Serial Number</span><span>نوع الجهاز</span><span>رقم Seat</span><span>حرف Seat</span>
         </div>
         <div id="bulk-rows-container"></div>
         <button type="button" class="bulk-add-row-btn" onclick="addBulkRow()">+ إضافة سطر</button>
       </div>
       <!-- نوع الجهاز اتنقل للجدول — بيتملى تلقائياً أو يكتبه المستخدم -->
       <div class="form-group"><label>رقم التيكت <span class="opt-badge">اختياري</span></label><input type="text" class="add-modal-input" id="bulk-ticket" placeholder="TK-2025-001"></div>
+      <div class="bulk-warning-bar" id="bulk-warning-bar" onclick="scrollToProblemRow()"></div>
       <div class="error-box" id="bulk-error"></div>
       <div class="modal-btns" id="bulk-action-btns">
         <button class="btn-ok" id="bulk-submit-btn" onclick="startBulkMove()">🚀 تنفيذ النقل</button>
@@ -977,8 +978,7 @@ function openBulkModal(){
   document.getElementById('bulk-toFloor').innerHTML='<option value="">-- اختر --</option>';
   (appSettings.floors||[]).forEach(function(f){ var o=document.createElement('option'); o.value=f; o.textContent=f; document.getElementById('bulk-toFloor').appendChild(o); });
   document.getElementById('bulk-toRoom').innerHTML='<option value="">-- اختر --</option>';
-  document.getElementById('bulk-deviceType').innerHTML='<option value="">-- اختر --</option>';
-  (appSettings.deviceTypes||[]).forEach(function(t){ var o=document.createElement('option'); o.value=t; o.textContent=t; document.getElementById('bulk-deviceType').appendChild(o); });
+  // نوع الجهاز في كل صف — مش قائمة منسدلة
   document.getElementById('bulk-error').style.display='none';
   document.getElementById('bulk-progress').style.display='none';
   document.getElementById('bulk-results').style.display='none';
