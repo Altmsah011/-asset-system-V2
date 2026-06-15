@@ -943,6 +943,8 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
 
       if(container.lastChild) container.lastChild.scrollIntoView({block:'nearest'});
       if(created>0) showToast('✅ تم إنشاء '+created+' صف جديد', 'success');
+      // lookup تلقائي لكل الصفوف الجديدة
+      setTimeout(bulkLookupTypes, 200);
     };
   }
 
@@ -951,19 +953,27 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
   row.querySelector('.bulk-seatnum-inp').addEventListener('paste',   makePasteHandler(2));
   row.querySelector('.bulk-seatletter-inp').addEventListener('paste',makePasteHandler(3));
 
-  // auto-lookup نوع الجهاز لما يكتب سيريال
-  row.querySelector('.bulk-serial-inp').addEventListener('change', async function(){
-    var s = this.value.trim(); if(!s) return;
+  // auto-lookup نوع الجهاز — شغال على change وبعد paste
+  async function doLookup(serial, row){
+    if(!serial) return;
     var typeInp = row.querySelector('.bulk-type-inp');
     if(typeInp.value.trim()) return; // لو مكتوب بالفعل متغيرش
     try{
-      var res = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:s, assetNumber:''});
+      var res = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:serial, assetNumber:''});
       if(res.success && res.device && res.device.deviceType){
         typeInp.value = res.device.deviceType;
         typeInp.classList.add('ok'); typeInp.classList.remove('warn');
       }
     }catch(e){}
+  }
+
+  // change — لما يكتب يدوي
+  row.querySelector('.bulk-serial-inp').addEventListener('change', function(){
+    doLookup(this.value.trim(), row);
   });
+
+  // بعد paste في خانة السيريال — استنى شوية وبعدين lookup
+  // (الـ paste handler الأساسي في makePasteHandler بيتكفل بالـ bulk lookup)
 
   if(!serial) row.querySelector('.bulk-serial-inp').focus();
 }
@@ -993,6 +1003,33 @@ function openBulkModal(){
 }
 
 function closeBulkModal(){ document.getElementById('bulk-modal').classList.remove('show'); }
+
+// lookup جماعي بعد paste لكل الصفوف اللي مش عندها نوع
+async function bulkLookupTypes(){
+  var rows = Array.from(document.querySelectorAll('#bulk-rows-container .bulk-row'));
+  var toLookup = [];
+  rows.forEach(function(row){
+    var serial  = row.querySelector('.bulk-serial-inp').value.trim();
+    var typeInp = row.querySelector('.bulk-type-inp');
+    if(serial && !typeInp.value.trim()){
+      toLookup.push({serial:serial, typeInp:typeInp});
+    }
+  });
+  // batch of 5 عشان منثقلش على الـ API
+  var BATCH = 5;
+  for(var b=0; b<toLookup.length; b+=BATCH){
+    var batch = toLookup.slice(b, b+BATCH);
+    await Promise.all(batch.map(function(item){
+      return api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:item.serial, assetNumber:''})
+        .then(function(res){
+          if(res.success && res.device && res.device.deviceType){
+            item.typeInp.value = res.device.deviceType;
+            item.typeInp.classList.add('ok'); item.typeInp.classList.remove('warn');
+          }
+        }).catch(function(){});
+    }));
+  }
+}
 
 function bulkFilterRooms(){
   var floor=document.getElementById('bulk-toFloor').value, rs=document.getElementById('bulk-toRoom');
