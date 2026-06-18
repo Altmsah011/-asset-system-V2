@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ATS">
 <meta name="theme-color" content="#4f46e5">
 <link rel="manifest" href="manifest.json">
 <title>نظام تتبع الأصول</title>
@@ -142,7 +144,7 @@ th{text-align:right;padding:10px 12px;color:var(--text3);font-weight:600;border-
 td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);white-space:nowrap}
 .device-row{cursor:pointer;transition:background .15s}
 .device-row:hover{background:var(--primary-light)}
-.seat-badge{background:var(--primary-light);color:var(--primary-text);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600}
+.seat-badge{background:var(--primary-light);color:var(--primary-text);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600;display:inline-block;unicode-bidi:plaintext;direction:ltr}
 
 /* USERS */
 .users-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
@@ -746,7 +748,7 @@ function renderMovementsTable(rows){
     var seat=[m.to_seat_number,m.to_seat_letter].filter(Boolean).join('');
     var dt=m.timestamp?new Date(m.timestamp).toLocaleString('ar-EG'):'—';
     var tr=document.createElement('tr'); tr.className='device-row';
-    tr.onclick=function(){ openDeviceModalByQuery(m.serial_number||m.asset_number); };
+    tr.onclick=function(){ openDeviceModal(movementRowToDevice(m)); };
     tr.innerHTML='<td>'+(i+1)+'</td><td>'+(m.serial_number||'—')+'</td><td>'+(m.asset_number||'—')+'</td><td>'+(m.device_type||'—')+'</td><td>'+(m.department||'—')+'</td><td>'+(m.to_location||'—')+'</td><td>'+(m.to_floor||'—')+'</td><td>'+(m.to_room||'—')+'</td><td>'+(seat?'<span class="seat-badge">'+seat+'</span>':'—')+'</td><td>'+dt+'</td><td>'+(m.moved_by||'—')+'</td>';
     tbody.appendChild(tr);
   });
@@ -794,6 +796,16 @@ function syncScrollTop(){
 }
 
 // ===== DEVICE MODAL =====
+// يحول صف من جدول "آخر الحركات" لشكل بيانات الجهاز — عشان نفتح الـ Modal فوراً من غير request إضافية
+function movementRowToDevice(m){
+  return {
+    serial_number: m.serial_number, asset_number: m.asset_number,
+    device_type: m.device_type, department: m.department,
+    current_location: m.to_location, floor: m.to_floor, room: m.to_room,
+    seat_number: m.to_seat_number, seat_letter: m.to_seat_letter,
+    last_movement: m.timestamp, moved_by: m.moved_by
+  };
+}
 async function openDeviceModalByQuery(q){ if(!q)return; try{ var r=await api('searchAllDevices',{query:q.toString(),spreadsheetId:currentUser.spreadsheetId}); if(r.success&&r.data&&r.data.length>0) openDeviceModal(r.data[0]); }catch(e){} }
 async function openDeviceModal(d){
   document.getElementById('dm-title').textContent = d.device_type||'تفاصيل الجهاز';
@@ -808,7 +820,7 @@ async function openDeviceModal(d){
   document.getElementById('dm-lastmove').textContent = d.last_movement?new Date(d.last_movement).toLocaleString('ar-EG'):'—';
   document.getElementById('dm-movedby').textContent  = d.moved_by||'—';
   document.getElementById('dm-movements').innerHTML  = '<div class="no-mov">⏳ جاري التحميل...</div>';
-  document.getElementById('device-modal').classList.add('show');
+  document.getElementById('device-modal').classList.add('show'); // افتح فوراً — مش منتظرين أي request
   try {
     var res = await api('getDeviceMovements',{spreadsheetId:currentUser.spreadsheetId, serial:d.serial_number, assetNumber:d.asset_number});
     if(res.success&&res.data&&res.data.length>0){
@@ -1004,7 +1016,7 @@ function openBulkModal(){
 
 function closeBulkModal(){ document.getElementById('bulk-modal').classList.remove('show'); }
 
-// lookup جماعي بعد paste لكل الصفوف اللي مش عندها نوع
+// lookup جماعي — request واحدة بكل السيريالات
 async function bulkLookupTypes(){
   var rows = Array.from(document.querySelectorAll('#bulk-rows-container .bulk-row'));
   var toLookup = [];
@@ -1015,19 +1027,28 @@ async function bulkLookupTypes(){
       toLookup.push({serial:serial, typeInp:typeInp});
     }
   });
-  // batch of 5 عشان منثقلش على الـ API
-  var BATCH = 5;
-  for(var b=0; b<toLookup.length; b+=BATCH){
-    var batch = toLookup.slice(b, b+BATCH);
-    await Promise.all(batch.map(function(item){
-      return api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:item.serial, assetNumber:''})
-        .then(function(res){
-          if(res.success && res.device && res.device.deviceType){
-            item.typeInp.value = res.device.deviceType;
-            item.typeInp.classList.add('ok'); item.typeInp.classList.remove('warn');
-          }
-        }).catch(function(){});
-    }));
+  if(!toLookup.length) return;
+
+  // بعت كل السيريالات في request واحدة بس
+  try {
+    var serials = toLookup.map(function(item){ return item.serial; });
+    var res = await api('lookupManyDevices', {
+      serials: serials,
+      spreadsheetId: currentUser.spreadsheetId
+    });
+    if(res.success && res.data){
+      toLookup.forEach(function(item){
+        var key = item.serial.toLowerCase();
+        var device = res.data[key];
+        if(device && device.device_type){
+          item.typeInp.value = device.device_type;
+          item.typeInp.classList.add('ok');
+          item.typeInp.classList.remove('warn');
+        }
+      });
+    }
+  } catch(e) {
+    console.error('bulk lookup error:', e);
   }
 }
 
@@ -1169,6 +1190,15 @@ function scrollToProblemRow(){
 loadTheme();
 var savedUser=loadSession();
 if(savedUser){ currentUser=savedUser; loadSettings().then(function(){ showHome(); }); }
+
+// تسجيل Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg){ console.log('SW registered'); })
+      .catch(function(err){ console.log('SW error:', err); });
+  });
+}
 </script>
 </body>
 </html>
