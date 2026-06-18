@@ -745,7 +745,7 @@ function renderMovementsTable(rows){
   document.getElementById('d-table').style.display='table';
   tbody.innerHTML='';
   rows.forEach(function(m,i){
-    var seat=[m.to_seat_number,m.to_seat_letter].filter(Boolean).join('');
+    var seat=[m.to_seat_num,m.to_seat_letter].filter(Boolean).join('');
     var dt=m.timestamp?new Date(m.timestamp).toLocaleString('ar-EG'):'—';
     var tr=document.createElement('tr'); tr.className='device-row';
     tr.onclick=function(){ openDeviceModal(movementRowToDevice(m)); };
@@ -802,7 +802,7 @@ function movementRowToDevice(m){
     serial_number: m.serial_number, asset_number: m.asset_number,
     device_type: m.device_type, department: m.department,
     current_location: m.to_location, floor: m.to_floor, room: m.to_room,
-    seat_number: m.to_seat_number, seat_letter: m.to_seat_letter,
+    seat_number: m.to_seat_num, seat_letter: m.to_seat_letter,
     last_movement: m.timestamp, moved_by: m.moved_by
   };
 }
