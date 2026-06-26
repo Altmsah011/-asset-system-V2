@@ -187,7 +187,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 .btn-cancel{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
 
 /* BULK MOVE MODAL */
-.bulk-modal-card{max-width:640px}
+.bulk-modal-card{max-width:96vw;width:96vw}
 .bulk-textarea{width:100%;min-height:140px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);resize:vertical;margin-bottom:1rem;line-height:1.7}
 .bulk-textarea:focus{border-color:var(--primary);outline:none}
 .bulk-progress{margin-top:1rem;display:none}
@@ -197,11 +197,15 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 .bulk-results{margin-top:1rem;max-height:200px;overflow-y:auto;display:none}
 
 /* BULK GRID */
-.bulk-grid-header{display:grid;grid-template-columns:1fr 140px 140px 80px 80px 32px;gap:6px;margin-bottom:4px;padding:0 2px}
+.bulk-grid-header{display:grid;grid-template-columns:2fr 1fr 1fr 32px 90px 90px;gap:8px;margin-bottom:4px;padding:0 2px}
 .bulk-grid-header span{font-size:12px;color:var(--text3);font-weight:600}
-.bulk-row{display:grid;grid-template-columns:1fr 140px 140px 80px 80px 32px 32px;gap:6px;margin-bottom:6px;align-items:center}
+.bulk-row{display:grid;grid-template-columns:2fr 1fr 1fr 32px 90px 90px 36px;gap:8px;margin-bottom:6px;align-items:center}
 .bulk-row select.device-type-inp{padding:8px 6px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit;width:100%}
 .bulk-dept-add-btn{background:#22c55e;color:#fff;border:none;border-radius:6px;padding:6px 8px;font-size:14px;cursor:pointer;flex-shrink:0}
+.bulk-dept-toolbar{display:flex;gap:8px;align-items:center;background:var(--surface2);border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-wrap:wrap}
+.bulk-dept-toolbar-label{font-size:12px;color:var(--text2);white-space:nowrap;flex-shrink:0}
+.bulk-dept-apply-btn{padding:7px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.bulk-dept-clear-btn{padding:7px 14px;background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
 .bulk-row input{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit;width:100%}
 .bulk-row input:focus{border-color:var(--primary);outline:none}
 .bulk-row-del{background:var(--danger-bg);color:var(--danger);border:none;border-radius:6px;padding:6px 8px;cursor:pointer;font-size:14px;flex-shrink:0}
@@ -218,6 +222,20 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 .bulk-result-serial{color:var(--text);font-weight:500;min-width:120px}
 .bulk-result-msg{color:var(--text3);font-size:12px}
 
+@media(max-width:700px){
+  .bulk-modal-card{max-width:99vw;width:99vw}
+  .bulk-grid-header{display:none}
+  .bulk-row{grid-template-columns:1fr 1fr;grid-template-areas:"serial serial" "type dept" "deptbtn deptbtn" "seatnum seatletter" "del del";gap:6px;background:var(--surface2);border-radius:10px;padding:8px;margin-bottom:10px}
+  .bulk-row .bulk-serial-inp{grid-area:serial}
+  .bulk-row .bulk-type-inp{grid-area:type}
+  .bulk-row .bulk-dept-inp{grid-area:dept}
+  .bulk-row .bulk-dept-add-btn{grid-area:deptbtn;width:100%}
+  .bulk-row .bulk-seatnum-inp{grid-area:seatnum}
+  .bulk-row .bulk-seatletter-inp{grid-area:seatletter}
+  .bulk-row .bulk-row-del{grid-area:del;width:100%}
+  .bulk-dept-toolbar{flex-direction:column;align-items:stretch}
+  .bulk-dept-toolbar-label{margin-bottom:4px}
+}
 @media(max-width:500px){
   .menu-grid{gap:.75rem}
   .menu-card{padding:1.25rem .75rem}
@@ -446,8 +464,14 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
       <!-- جدول السيريال + نوع الجهاز + الإدارة + السيت -->
       <div class="form-group">
         <label>بيانات الأجهزة — كل صف: Serial | نوع الجهاز | الإدارة | رقم Seat | حرف Seat</label>
+        <div class="bulk-dept-toolbar">
+          <span class="bulk-dept-toolbar-label">تطبيق إدارة على كل الصفوف:</span>
+          <select class="add-modal-input" id="bulk-dept-all-select" style="margin-bottom:0;flex:1"><option value="">-- اختر إدارة --</option></select>
+          <button type="button" class="bulk-dept-apply-btn" onclick="applyDeptToAllRows()">تطبيق على الكل</button>
+          <button type="button" class="bulk-dept-clear-btn" onclick="clearDeptFromAllRows()">مسح الكل</button>
+        </div>
         <div class="bulk-grid-header">
-          <span>Serial Number</span><span>نوع الجهاز</span><span>الإدارة/الأكونت</span><span>رقم Seat</span><span>حرف Seat</span><span></span>
+          <span>Serial Number</span><span>نوع الجهاز</span><span>الإدارة/الأكونت</span><span></span><span>رقم Seat</span><span>حرف Seat</span>
         </div>
         <div id="bulk-rows-container"></div>
         <button type="button" class="bulk-add-row-btn" onclick="addBulkRow()">+ إضافة سطر</button>
@@ -885,6 +909,9 @@ async function confirmAdd(){
       document.querySelectorAll('#bulk-rows-container .bulk-dept-inp').forEach(function(sel){
         var o=document.createElement('option'); o.value=value; o.textContent=value; sel.appendChild(o);
       });
+      // حدّث قائمة "تطبيق على الكل" كمان
+      var allSel = document.getElementById('bulk-dept-all-select');
+      if(allSel){ var o2=document.createElement('option'); o2.value=value; o2.textContent=value; allSel.appendChild(o2); }
       // اختار القيمة الجديدة في الصف اللي ضغط منه +
       if(addModalMeta.btnEl){
         var theRow = addModalMeta.btnEl.closest('.bulk-row');
@@ -915,9 +942,9 @@ function addBulkRow(serial, deviceType, department, seatNum, seatLetter){
     '<input type="text" placeholder="Serial Number" value="'+(serial||'')+'" class="bulk-serial-inp">'+
     '<input type="text" placeholder="نوع الجهاز" value="'+(deviceType||'')+'" class="device-type-inp bulk-type-inp">'+
     '<select class="device-type-inp bulk-dept-inp">'+deptOptions+'</select>'+
+    '<button type="button" class="bulk-dept-add-btn" title="إضافة إدارة جديدة" onclick="openBulkAddDeptModal(this)">+</button>'+
     '<input type="text" placeholder="رقم" value="'+(seatNum||'')+'" class="bulk-seatnum-inp" maxlength="3">'+
     '<input type="text" placeholder="حرف" value="'+(seatLetter||'')+'" class="bulk-seatletter-inp" maxlength="3">'+
-    '<button type="button" class="bulk-dept-add-btn" title="إضافة إدارة جديدة" onclick="openBulkAddDeptModal(this)">+</button>'+
     '<button type="button" class="bulk-row-del" onclick="this.parentElement.remove()">✕</button>';
   container.appendChild(row);
 
@@ -1091,6 +1118,8 @@ function openBulkModal(){
   document.getElementById('bulk-toFloor').innerHTML='<option value="">-- اختر --</option>';
   (appSettings.floors||[]).forEach(function(f){ var o=document.createElement('option'); o.value=f; o.textContent=f; document.getElementById('bulk-toFloor').appendChild(o); });
   document.getElementById('bulk-toRoom').innerHTML='<option value="">-- اختر --</option>';
+  document.getElementById('bulk-dept-all-select').innerHTML='<option value="">-- اختر إدارة --</option>';
+  (appSettings.departments||[]).forEach(function(dep){ var o=document.createElement('option'); o.value=dep; o.textContent=dep; document.getElementById('bulk-dept-all-select').appendChild(o); });
   document.getElementById('bulk-error').style.display='none';
   document.getElementById('bulk-progress').style.display='none';
   document.getElementById('bulk-results').style.display='none';
@@ -1103,6 +1132,25 @@ function openBulkModal(){
   document.getElementById('bulk-cancel-btn').style.display='';
   document.getElementById('bulk-submit-btn').style.display='';
   document.getElementById('bulk-modal').classList.add('show');
+}
+
+// تطبيق إدارة واحدة على كل الصفوف الموجودة دلوقتي
+function applyDeptToAllRows(){
+  var dept = document.getElementById('bulk-dept-all-select').value;
+  if(!dept){ showToast('❌ اختر إدارة الأول', 'error'); return; }
+  document.querySelectorAll('#bulk-rows-container .bulk-dept-inp').forEach(function(sel){
+    setRowFieldValue(sel, dept);
+  });
+  showToast('✅ تم تطبيق الإدارة على كل الصفوف', 'success');
+}
+
+// مسح الإدارة من كل الصفوف — عشان يبدأ المستخدم يختار من جديد لكل صف
+function clearDeptFromAllRows(){
+  document.querySelectorAll('#bulk-rows-container .bulk-dept-inp').forEach(function(sel){
+    sel.value = '';
+  });
+  document.getElementById('bulk-dept-all-select').value = '';
+  showToast('✅ تم مسح الإدارة من كل الصفوف', 'success');
 }
 
 function closeBulkModal(){ document.getElementById('bulk-modal').classList.remove('show'); }
