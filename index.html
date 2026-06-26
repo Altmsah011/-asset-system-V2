@@ -197,9 +197,11 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 .bulk-results{margin-top:1rem;max-height:200px;overflow-y:auto;display:none}
 
 /* BULK GRID */
-.bulk-grid-header{display:grid;grid-template-columns:1fr 140px 80px 80px;gap:6px;margin-bottom:4px;padding:0 2px}
+.bulk-grid-header{display:grid;grid-template-columns:1fr 140px 140px 80px 80px 32px;gap:6px;margin-bottom:4px;padding:0 2px}
 .bulk-grid-header span{font-size:12px;color:var(--text3);font-weight:600}
-.bulk-row{display:grid;grid-template-columns:1fr 140px 80px 80px 32px;gap:6px;margin-bottom:6px;align-items:center}
+.bulk-row{display:grid;grid-template-columns:1fr 140px 140px 80px 80px 32px 32px;gap:6px;margin-bottom:6px;align-items:center}
+.bulk-row select.device-type-inp{padding:8px 6px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit;width:100%}
+.bulk-dept-add-btn{background:#22c55e;color:#fff;border:none;border-radius:6px;padding:6px 8px;font-size:14px;cursor:pointer;flex-shrink:0}
 .bulk-row input{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit;width:100%}
 .bulk-row input:focus{border-color:var(--primary);outline:none}
 .bulk-row-del{background:var(--danger-bg);color:var(--danger);border:none;border-radius:6px;padding:6px 8px;cursor:pointer;font-size:14px;flex-shrink:0}
@@ -437,15 +439,15 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
   <div class="modal-card bulk-modal-card">
     <div class="modal-header"><h3>📦 نقل جماعي</h3><button class="modal-close" onclick="closeBulkModal()">✕</button></div>
     <div class="modal-body">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">أدخل بيانات الأجهزة في الجدول — Serial Number، نوع الجهاز (يتملى تلقائياً لو الجهاز موجود)، ورقم وحرف الـ Seat.</p>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">أدخل بيانات الأجهزة في الجدول — Serial Number، نوع الجهاز، الإدارة/الأكونت (يتملوا تلقائياً لو الجهاز موجود، وتقدر تعدلهم)، ورقم وحرف الـ Seat.</p>
       <div class="form-group"><label>الموقع الجديد</label><select class="add-modal-input" id="bulk-toLocation"><option value="">-- اختر --</option></select></div>
       <div class="form-group"><label>الدور</label><select class="add-modal-input" id="bulk-toFloor" onchange="bulkFilterRooms()"><option value="">-- اختر --</option></select></div>
       <div class="form-group"><label>الصالة / الغرفة</label><select class="add-modal-input" id="bulk-toRoom"><option value="">-- اختر --</option></select></div>
-      <!-- جدول السيريال + نوع الجهاز + السيت -->
+      <!-- جدول السيريال + نوع الجهاز + الإدارة + السيت -->
       <div class="form-group">
-        <label>بيانات الأجهزة — كل صف: Serial | نوع الجهاز | رقم Seat | حرف Seat</label>
+        <label>بيانات الأجهزة — كل صف: Serial | نوع الجهاز | الإدارة | رقم Seat | حرف Seat</label>
         <div class="bulk-grid-header">
-          <span>Serial Number</span><span>نوع الجهاز</span><span>رقم Seat</span><span>حرف Seat</span>
+          <span>Serial Number</span><span>نوع الجهاز</span><span>الإدارة/الأكونت</span><span>رقم Seat</span><span>حرف Seat</span><span></span>
         </div>
         <div id="bulk-rows-container"></div>
         <button type="button" class="bulk-add-row-btn" onclick="addBulkRow()">+ إضافة سطر</button>
@@ -874,6 +876,24 @@ async function confirmAdd(){
   var value=document.getElementById('add-modal-input').value.trim(); if(!value)return; closeAddModal();
   var type=addModalMeta.type, column=addModalMeta.column, prefix=addModalMeta.prefix;
   if(type==='room'){ var floor=document.getElementById('m-'+prefix+'Floor').value; try{ await api('addRoomWithFloor',{spreadsheetId:currentUser.spreadsheetId,roomName:value,floor:floor}); if(!appSettings.rooms) appSettings.rooms=[]; appSettings.rooms.push({name:value,floor:floor}); filterRooms(prefix); document.getElementById('m-'+prefix+'Room').value=value; }catch(e){ showToast('❌ '+e.message,'error'); } return; }
+  if(type==='bulkDepartment'){
+    try {
+      await api('addSettingItem',{spreadsheetId:currentUser.spreadsheetId,column:2,value:value});
+      if(!appSettings.departments) appSettings.departments=[];
+      appSettings.departments.push(value);
+      // حدّث كل قوائم الإدارة الموجودة دلوقتي في صفوف النقل الجماعي
+      document.querySelectorAll('#bulk-rows-container .bulk-dept-inp').forEach(function(sel){
+        var o=document.createElement('option'); o.value=value; o.textContent=value; sel.appendChild(o);
+      });
+      // اختار القيمة الجديدة في الصف اللي ضغط منه +
+      if(addModalMeta.btnEl){
+        var theRow = addModalMeta.btnEl.closest('.bulk-row');
+        if(theRow) theRow.querySelector('.bulk-dept-inp').value = value;
+      }
+      showToast('✅ تمت إضافة الإدارة', 'success');
+    } catch(e){ showToast('❌ '+e.message,'error'); }
+    return;
+  }
   try {
     await api('addSettingItem',{spreadsheetId:currentUser.spreadsheetId,column:column,value:value});
     if(type==='deviceType'){ if(!appSettings.deviceTypes) appSettings.deviceTypes=[]; appSettings.deviceTypes.push(value); fillSelect('m-deviceType',appSettings.deviceTypes); document.getElementById('m-deviceType').value=value; }
@@ -885,17 +905,29 @@ async function confirmAdd(){
 // ===== BULK MOVE =====
 var problemRowEl = null; // الصف اللي فيه مشكلة (نوع الجهاز فاضي)
 
-function addBulkRow(serial, deviceType, seatNum, seatLetter){
+function addBulkRow(serial, deviceType, department, seatNum, seatLetter){
   var container = document.getElementById('bulk-rows-container');
   var row = document.createElement('div');
   row.className = 'bulk-row';
+  var deptOptions = '<option value="">-- اختر --</option>';
+  (appSettings.departments||[]).forEach(function(dep){ deptOptions += '<option value="'+dep+'">'+dep+'</option>'; });
   row.innerHTML =
     '<input type="text" placeholder="Serial Number" value="'+(serial||'')+'" class="bulk-serial-inp">'+
     '<input type="text" placeholder="نوع الجهاز" value="'+(deviceType||'')+'" class="device-type-inp bulk-type-inp">'+
+    '<select class="device-type-inp bulk-dept-inp">'+deptOptions+'</select>'+
     '<input type="text" placeholder="رقم" value="'+(seatNum||'')+'" class="bulk-seatnum-inp" maxlength="3">'+
     '<input type="text" placeholder="حرف" value="'+(seatLetter||'')+'" class="bulk-seatletter-inp" maxlength="3">'+
+    '<button type="button" class="bulk-dept-add-btn" title="إضافة إدارة جديدة" onclick="openBulkAddDeptModal(this)">+</button>'+
     '<button type="button" class="bulk-row-del" onclick="this.parentElement.remove()">✕</button>';
   container.appendChild(row);
+
+  // لو الإدارة المبعوتة موجودة في القائمة، اختارها — لو مش موجودة (نادر) أضفها كخيار وقتي
+  if(department){
+    var deptSelect = row.querySelector('.bulk-dept-inp');
+    var hasOption = Array.from(deptSelect.options).some(function(o){ return o.value===department; });
+    if(!hasOption){ var o=document.createElement('option'); o.value=department; o.textContent=department; deptSelect.appendChild(o); }
+    deptSelect.value = department;
+  }
 
   // paste handler — يوزّع البيانات على صفوف لما يكون فيها أكتر من سطر/عمود
   function makePasteHandler(colIndex){
@@ -909,10 +941,10 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
         // سطر واحد — لو فيه تابات (من Excel) وزّعها على الأعمدة في الصف الحالي
         var cols = lines[0].split(/\t/);
         if(cols.length > 1){
-          var inps = [row.querySelector('.bulk-serial-inp'), row.querySelector('.bulk-type-inp'), row.querySelector('.bulk-seatnum-inp'), row.querySelector('.bulk-seatletter-inp')];
-          cols.forEach(function(val, ci){ if(inps[ci]) inps[ci].value = val.trim(); });
+          var inps = [row.querySelector('.bulk-serial-inp'), row.querySelector('.bulk-type-inp'), row.querySelector('.bulk-dept-inp'), row.querySelector('.bulk-seatnum-inp'), row.querySelector('.bulk-seatletter-inp')];
+          cols.forEach(function(val, ci){ setRowFieldValue(inps[ci], val.trim()); });
         } else {
-          e.target.value = cols[0].trim();
+          setRowFieldValue(e.target, cols[0].trim());
         }
         setTimeout(bulkLookupTypes, 150);
         return;
@@ -924,6 +956,7 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
       var curRowIdx = allRows.indexOf(row);
       var rowIsEmpty = !row.querySelector('.bulk-serial-inp').value.trim() &&
                        !row.querySelector('.bulk-type-inp').value.trim() &&
+                       !row.querySelector('.bulk-dept-inp').value.trim() &&
                        !row.querySelector('.bulk-seatnum-inp').value.trim() &&
                        !row.querySelector('.bulk-seatletter-inp').value.trim();
       if(rowIsEmpty) row.remove();
@@ -938,24 +971,24 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
         var targetRow     = existingRows[curRowIdx + li];
 
         if(targetRow){
-          var inps = [targetRow.querySelector('.bulk-serial-inp'), targetRow.querySelector('.bulk-type-inp'), targetRow.querySelector('.bulk-seatnum-inp'), targetRow.querySelector('.bulk-seatletter-inp')];
+          var inps = [targetRow.querySelector('.bulk-serial-inp'), targetRow.querySelector('.bulk-type-inp'), targetRow.querySelector('.bulk-dept-inp'), targetRow.querySelector('.bulk-seatnum-inp'), targetRow.querySelector('.bulk-seatletter-inp')];
           if(cols.length > 1){
             // النص فيه تابات — وزّع كل الأعمدة بداية من colIndex
             cols.forEach(function(v, ci){
               var targetCol = colIndex + ci;
-              if(inps[targetCol]) inps[targetCol].value = v.trim();
+              if(inps[targetCol]) setRowFieldValue(inps[targetCol], v.trim());
             });
           } else if(inps[colIndex]){
-            inps[colIndex].value = val;
+            setRowFieldValue(inps[colIndex], val);
           }
         } else {
-          var args = ['','','',''];
+          var args = ['','','','',''];
           if(cols.length > 1){
-            cols.forEach(function(v, ci){ var tc=colIndex+ci; if(tc<4) args[tc]=v.trim(); });
+            cols.forEach(function(v, ci){ var tc=colIndex+ci; if(tc<5) args[tc]=v.trim(); });
           } else {
             args[colIndex] = val;
           }
-          addBulkRow(args[0], args[1], args[2], args[3]);
+          addBulkRow(args[0], args[1], args[2], args[3], args[4]);
           created++;
         }
       });
@@ -968,18 +1001,24 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
 
   row.querySelector('.bulk-serial-inp').addEventListener('paste',     makePasteHandler(0));
   row.querySelector('.bulk-type-inp').addEventListener('paste',       makePasteHandler(1));
-  row.querySelector('.bulk-seatnum-inp').addEventListener('paste',    makePasteHandler(2));
-  row.querySelector('.bulk-seatletter-inp').addEventListener('paste', makePasteHandler(3));
+  row.querySelector('.bulk-seatnum-inp').addEventListener('paste',    makePasteHandler(3));
+  row.querySelector('.bulk-seatletter-inp').addEventListener('paste', makePasteHandler(4));
 
-  // lookup تلقائي لما يكتب سيريال يدوي ويخرج من الخانة
+  // lookup تلقائي لما يكتب سيريال يدوي ويخرج من الخانة — يملي النوع والإدارة الافتراضيين
   row.querySelector('.bulk-serial-inp').addEventListener('change', function(){
     var s = this.value.trim(); if(!s) return;
     var typeInp = row.querySelector('.bulk-type-inp');
-    if(typeInp.value.trim()) return;
+    var deptInp = row.querySelector('.bulk-dept-inp');
+    if(typeInp.value.trim() && deptInp.value) return;
     api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:s, assetNumber:''}).then(function(res){
-      if(res.success && res.device && res.device.deviceType){
-        typeInp.value = res.device.deviceType;
-        typeInp.classList.add('ok'); typeInp.classList.remove('warn');
+      if(res.success && res.device){
+        if(!typeInp.value.trim() && res.device.deviceType){
+          typeInp.value = res.device.deviceType;
+          typeInp.classList.add('ok'); typeInp.classList.remove('warn');
+        }
+        if(!deptInp.value && res.device.department){
+          setRowFieldValue(deptInp, res.device.department);
+        }
       }
     }).catch(function(){});
   });
@@ -987,15 +1026,37 @@ function addBulkRow(serial, deviceType, seatNum, seatLetter){
   if(!serial) row.querySelector('.bulk-serial-inp').focus();
 }
 
-// lookup جماعي — request واحدة بكل السيريالات اللي لسه من غير نوع
+// يحط قيمة في select أو input بحسب نوع العنصر — لو القيمة مش موجودة كـ option، يضيفها
+function setRowFieldValue(field, value){
+  if(!field) return;
+  if(field.tagName === 'SELECT'){
+    var hasOption = Array.from(field.options).some(function(o){ return o.value===value; });
+    if(!hasOption && value){ var o=document.createElement('option'); o.value=value; o.textContent=value; field.appendChild(o); }
+    field.value = value;
+  } else {
+    field.value = value;
+  }
+}
+
+// إضافة إدارة جديدة من أي صف في النقل الجماعي — بتتحدث في كل الصفوف فوراً
+function openBulkAddDeptModal(btnEl){
+  addModalMeta = {type:'bulkDepartment', btnEl: btnEl};
+  document.getElementById('add-modal-title').textContent = 'إضافة إدارة جديدة';
+  document.getElementById('add-modal-input').value = '';
+  document.getElementById('add-modal').classList.add('show');
+  setTimeout(function(){ document.getElementById('add-modal-input').focus(); }, 100);
+}
+
+// lookup جماعي — request واحدة بكل السيريالات اللي لسه من غير نوع أو إدارة
 async function bulkLookupTypes(){
   var rows = Array.from(document.querySelectorAll('#bulk-rows-container .bulk-row'));
   var toLookup = [];
   rows.forEach(function(row){
     var serial  = row.querySelector('.bulk-serial-inp').value.trim();
     var typeInp = row.querySelector('.bulk-type-inp');
-    if(serial && !typeInp.value.trim()){
-      toLookup.push({serial:serial, typeInp:typeInp});
+    var deptInp = row.querySelector('.bulk-dept-inp');
+    if(serial && (!typeInp.value.trim() || !deptInp.value)){
+      toLookup.push({serial:serial, typeInp:typeInp, deptInp:deptInp});
     }
   });
   if(!toLookup.length) return;
@@ -1006,9 +1067,14 @@ async function bulkLookupTypes(){
       toLookup.forEach(function(item){
         var key = item.serial.toLowerCase();
         var device = res.data[key];
-        if(device && device.device_type){
-          item.typeInp.value = device.device_type;
-          item.typeInp.classList.add('ok'); item.typeInp.classList.remove('warn');
+        if(device){
+          if(!item.typeInp.value.trim() && device.device_type){
+            item.typeInp.value = device.device_type;
+            item.typeInp.classList.add('ok'); item.typeInp.classList.remove('warn');
+          }
+          if(!item.deptInp.value && device.department){
+            setRowFieldValue(item.deptInp, device.department);
+          }
         }
       });
     }
@@ -1057,9 +1123,10 @@ async function startBulkMove(){
   rows.forEach(function(row){
     var serial     = row.querySelector('.bulk-serial-inp').value.trim();
     var deviceType = row.querySelector('.bulk-type-inp').value.trim();
+    var department = row.querySelector('.bulk-dept-inp').value.trim();
     var seatNum    = row.querySelector('.bulk-seatnum-inp').value.trim();
     var seatLetter = row.querySelector('.bulk-seatletter-inp').value.trim();
-    if(serial) devices.push({serial:serial, deviceType:deviceType, seatNum:seatNum, seatLetter:seatLetter, rowEl:row});
+    if(serial) devices.push({serial:serial, deviceType:deviceType, department:department, seatNum:seatNum, seatLetter:seatLetter, rowEl:row});
   });
 
   var toLoc   = document.getElementById('bulk-toLocation').value;
@@ -1099,7 +1166,7 @@ async function startBulkMove(){
     var seatLabel = (d.seatNum||d.seatLetter) ? ((d.seatLetter||'')+(d.seatNum||'')) : '—';
     item.innerHTML='<span class="bulk-result-icon">⏳</span>'+
       '<span class="bulk-result-serial">'+d.serial+'</span>'+
-      '<span class="bulk-result-msg" style="color:var(--text3);font-size:11px">'+(d.deviceType||'')+' · Seat: '+seatLabel+'</span>'+
+      '<span class="bulk-result-msg" style="color:var(--text3);font-size:11px">'+(d.deviceType||'')+(d.department?' · '+d.department:'')+' · Seat: '+seatLabel+'</span>'+
       '<span class="bulk-result-msg" id="brs-'+i+'">في الانتظار...</span>';
     resultsEl.appendChild(item);
   });
@@ -1118,7 +1185,7 @@ async function startBulkMove(){
         serial:         d.serial,
         assetNumber:    dev ? (dev.assetNumber||'')    : '',
         deviceType:     d.deviceType || (dev ? (dev.deviceType||'') : ''),
-        department:     dev ? (dev.department||'')     : '',
+        department:     d.department || (dev ? (dev.department||'') : ''),
         fromLocation:   dev ? (dev.currentLocation||'') : '',
         fromFloor:      dev ? (dev.floor||'')          : '',
         fromRoom:       dev ? (dev.room||'')           : '',
