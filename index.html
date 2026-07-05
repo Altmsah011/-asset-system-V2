@@ -222,6 +222,43 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 .bulk-result-serial{color:var(--text);font-weight:500;min-width:120px}
 .bulk-result-msg{color:var(--text3);font-size:12px}
 
+/* ===== WFH ===== */
+.wfh-tabs{display:flex;gap:8px;margin-bottom:1.5rem}
+.wfh-tab{flex:1;padding:12px;border:2px solid var(--border);border-radius:12px;text-align:center;cursor:pointer;background:var(--surface);transition:all .2s;font-family:inherit;font-size:14px;color:var(--text2)}
+.wfh-tab.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary-text);font-weight:600}
+.wfh-tab:hover:not(.active){border-color:var(--primary);background:var(--surface2)}
+.wfh-card{background:var(--surface);border-radius:16px;padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.wfh-section-title{font-size:14px;font-weight:600;color:var(--primary);margin-bottom:1rem;padding-bottom:8px;border-bottom:2px solid var(--primary-light)}
+.wfh-device-row{display:grid;grid-template-columns:1fr 120px 120px 32px;gap:6px;margin-bottom:6px;align-items:center}
+.wfh-device-row input,.wfh-device-row select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit;width:100%}
+.wfh-device-row input:focus,.wfh-device-row select:focus{border-color:var(--primary);outline:none}
+.wfh-device-header{display:grid;grid-template-columns:1fr 120px 120px 32px;gap:6px;margin-bottom:4px;font-size:12px;color:var(--text3);font-weight:600;padding:0 2px}
+.wfh-add-device-btn{padding:7px 14px;background:var(--primary-light);color:var(--primary);border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:4px}
+.amana-box{background:var(--surface2);border-radius:12px;padding:1rem;margin-top:.75rem;border:1px solid var(--border)}
+.amana-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;color:var(--text)}
+.amana-toggle input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:var(--primary)}
+.amana-details{margin-top:.75rem;display:none}
+.amana-details.show{display:block}
+.amana-value-wrap{display:flex;align-items:center;gap:8px}
+.amana-value-inp{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);font-family:inherit}
+.amana-edit-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--primary)}
+.amana-result{margin-top:.5rem;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600}
+.amana-result.ok{background:var(--success-bg);color:var(--success)}
+.amana-result.warn{background:var(--danger-bg);color:var(--danger)}
+.tenure-inp{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);font-family:inherit;width:100%}
+.wfh-lookup-result{background:var(--primary-light);border-radius:12px;padding:1rem;margin-bottom:1rem}
+.wfh-lookup-name{font-size:16px;font-weight:700;color:var(--primary-text);margin-bottom:4px}
+.wfh-lookup-meta{font-size:13px;color:var(--text2)}
+.wfh-device-card{background:var(--surface2);border-radius:10px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:10px}
+.wfh-device-check{width:18px;height:18px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
+.wfh-device-info{flex:1}
+.wfh-device-serial{font-size:14px;font-weight:600;color:var(--text)}
+.wfh-device-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.condition-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);font-family:inherit;margin-top:.5rem}
+.condition-select:focus{border-color:var(--primary);outline:none}
+.wfh-condition-wrap{padding:.75rem;background:var(--surface2);border-radius:10px;margin-bottom:.5rem}
+.wfh-condition-wrap .wfh-device-serial{margin-bottom:.5rem}
+
 @media(max-width:700px){
   .bulk-modal-card{max-width:99vw;width:99vw}
   .bulk-grid-header{display:none}
@@ -277,6 +314,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
       <div class="menu-card" onclick="openDevicesPage()"><span class="card-icon">🖥️</span><h3>عرض الأجهزة</h3><p>آخر الحركات والبحث</p></div>
       <div class="menu-card admin-only" onclick="openUsersPage()" style="display:none"><span class="card-icon">👥</span><h3>إدارة المستخدمين</h3><p>إضافة وتعديل المستخدمين</p></div>
       <div class="menu-card" onclick="openBulkModal()"><span class="card-icon">📦</span><h3>نقل جماعي</h3><p>نقل أجهزة كتير دفعة واحدة</p></div>
+      <div class="menu-card" onclick="openWFHPage()"><span class="card-icon">🏠</span><h3>Work From Home</h3><p>تسليم وإرجاع أجهزة المنزل</p></div>
     </div>
   </div>
 </div>
@@ -393,6 +431,155 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
       <button class="add-user-btn" onclick="openUserForm(null)">+ إضافة مستخدم</button>
     </div>
     <div id="users-list"><div class="loading-msg">⏳</div></div>
+  </div>
+</div>
+
+
+<!-- WFH PAGE -->
+<div id="page-wfh" class="page">
+  <div class="navbar">
+    <div class="navbar-left"><button class="back-btn" onclick="goHome()">→ رجوع</button><h2>🏠 Work From Home</h2></div>
+  </div>
+  <div class="content" style="max-width:700px">
+    <!-- تبويبات -->
+    <div class="wfh-tabs">
+      <button class="wfh-tab active" id="wfh-tab-deliver" onclick="switchWFHTab('deliver')">📤 تسليم جهاز</button>
+      <button class="wfh-tab" id="wfh-tab-return"  onclick="switchWFHTab('return')">📥 إرجاع / استبدال</button>
+    </div>
+
+    <!-- ===== صفحة التسليم ===== -->
+    <div id="wfh-deliver-panel">
+      <!-- بيانات الموظف -->
+      <div class="wfh-card">
+        <div class="wfh-section-title">👤 بيانات الموظف</div>
+        <div class="form-group"><label>اسم الموظف</label><input type="text" class="add-modal-input" id="wfh-d-name" placeholder="الاسم كامل" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الرقم القومي</label><input type="text" class="add-modal-input" id="wfh-d-natid" placeholder="رقم البطاقة" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الرقم الوظيفي</label><input type="text" class="add-modal-input" id="wfh-d-empid" placeholder="Employee ID" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الإدارة / الأكونت</label>
+          <div class="input-wrap"><select class="add-modal-input" id="wfh-d-dept" style="margin-bottom:0"><option value="">-- اختر --</option></select><button class="add-btn" onclick="openAddModal('department','إضافة إدارة',2)">+</button></div>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>رقم التليفون <span class="opt-badge">اختياري</span></label><input type="text" class="add-modal-input" id="wfh-d-phone" placeholder="01xxxxxxxxx" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>توقيع مسئول الشئون الإدارية</label><input type="text" class="add-modal-input" id="wfh-d-sign" placeholder="اكتب اسمك" style="margin-bottom:0"></div>
+      </div>
+
+      <!-- الأجهزة -->
+      <div class="wfh-card">
+        <div class="wfh-section-title">💻 الأجهزة</div>
+        <div class="wfh-device-header"><span>Serial Number</span><span>نوع الجهاز</span><span>الماركة</span><span></span></div>
+        <div id="wfh-d-devices"></div>
+        <button type="button" class="wfh-add-device-btn" onclick="addWFHDeviceRow('deliver')">+ إضافة جهاز</button>
+      </div>
+
+      <!-- وصل الأمانة -->
+      <div class="wfh-card">
+        <div class="wfh-section-title">📝 وصل الأمانة <span class="opt-badge">اختياري</span></div>
+        <label class="amana-toggle">
+          <input type="checkbox" id="wfh-d-amana-check" onchange="toggleAmana()"> يوجد وصل أمانة
+        </label>
+        <div class="amana-details" id="wfh-d-amana-details">
+          <div class="form-group" style="margin-top:.75rem">
+            <label>قيمة الأمانة (جنيه)</label>
+            <div class="amana-value-wrap">
+              <input type="number" class="amana-value-inp" id="wfh-d-amana-val" value="33000" readonly>
+              <button class="amana-edit-btn" onclick="toggleAmanaEdit()" title="تعديل القيمة">✏️</button>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:.75rem">
+            <label>تاريخ التعيين (لحساب مدة الخدمة)</label>
+            <input type="date" class="tenure-inp" id="wfh-d-hire-date" onchange="calcTenure()">
+            <div id="wfh-d-tenure-result" style="margin-top:.5rem"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- كومنت -->
+      <div class="wfh-card">
+        <div class="wfh-section-title">📌 ملاحظات <span class="opt-badge">اختياري</span></div>
+        <textarea class="add-modal-input" id="wfh-d-comment" placeholder="ملاحظات أو عيوب موجودة وقت التسليم (لحماية الموظف)" style="min-height:80px;resize:vertical;margin-bottom:0"></textarea>
+      </div>
+
+      <button class="submit-btn" id="wfh-d-submit" onclick="submitDeliver()">📤 تسليم الأجهزة</button>
+      <div class="error-box" id="wfh-d-error"></div>
+    </div>
+
+    <!-- ===== صفحة الإرجاع / الاستبدال ===== -->
+    <div id="wfh-return-panel" style="display:none">
+      <!-- بحث عن الموظف -->
+      <div class="wfh-card">
+        <div class="wfh-section-title">🔍 بحث عن الموظف</div>
+        <div class="search-bar">
+          <input type="text" id="wfh-r-query" placeholder="اكتب الرقم الوظيفي أو الرقم القومي..." onkeydown="if(event.key==='Enter') searchWFHEmployee()">
+          <button class="search-btn" onclick="searchWFHEmployee()">بحث</button>
+        </div>
+        <div id="wfh-r-employee-result" style="display:none"></div>
+      </div>
+
+      <!-- الأجهزة الموجودة عند الموظف -->
+      <div class="wfh-card" id="wfh-r-devices-card" style="display:none">
+        <div class="wfh-section-title">📦 الأجهزة المسجلة على الموظف</div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:.75rem">اختر الأجهزة اللي رجعت:</p>
+        <div id="wfh-r-devices-list"></div>
+      </div>
+
+      <!-- نوع العملية -->
+      <div class="wfh-card" id="wfh-r-type-card" style="display:none">
+        <div class="wfh-section-title">🔄 نوع العملية</div>
+        <div style="display:flex;gap:8px">
+          <button class="wfh-tab active" id="wfh-op-return"  onclick="switchReturnOp('return')"  style="font-size:13px;padding:10px">📥 إرجاع للشركة</button>
+          <button class="wfh-tab"        id="wfh-op-replace" onclick="switchReturnOp('replace')" style="font-size:13px;padding:10px">🔄 استبدال لموظف تاني</button>
+        </div>
+      </div>
+
+      <!-- إرجاع — بيانات إضافية -->
+      <div class="wfh-card" id="wfh-r-return-details" style="display:none">
+        <div class="wfh-section-title">📍 بيانات الإرجاع</div>
+        <div class="form-group"><label>الموقع اللي تم فيه الإرجاع</label>
+          <select class="add-modal-input" id="wfh-r-location" style="margin-bottom:0"><option value="">-- اختر --</option></select>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>توقيع مسئول الشئون الإدارية</label>
+          <input type="text" class="add-modal-input" id="wfh-r-sign" placeholder="اكتب اسمك" style="margin-bottom:0">
+        </div>
+        <div class="form-group" style="margin-top:.75rem">
+          <label>حالة الجهاز / الأجهزة (بواسطة IT)</label>
+          <div id="wfh-r-conditions-list" style="margin-top:.5rem"></div>
+        </div>
+        <div class="form-group" style="margin-top:.75rem">
+          <label>كومنت <span class="opt-badge">اختياري — قابل للتعديل بعدين</span></label>
+          <textarea class="add-modal-input" id="wfh-r-comment" placeholder="تفاصيل حالة الجهاز أو أي ملاحظات" style="min-height:80px;resize:vertical;margin-bottom:0"></textarea>
+        </div>
+        <button class="submit-btn" id="wfh-r-submit" onclick="submitReturn()" style="margin-top:1rem">📥 تأكيد الإرجاع</button>
+        <div class="error-box" id="wfh-r-error"></div>
+      </div>
+
+      <!-- استبدال — بيانات الموظف الجديد -->
+      <div class="wfh-card" id="wfh-r-replace-details" style="display:none">
+        <div class="wfh-section-title">👤 بيانات الموظف الجديد المستلم</div>
+        <div class="form-group"><label>اسم الموظف الجديد</label><input type="text" class="add-modal-input" id="wfh-rp-name" placeholder="الاسم كامل" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الرقم القومي</label><input type="text" class="add-modal-input" id="wfh-rp-natid" placeholder="رقم البطاقة" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الرقم الوظيفي</label><input type="text" class="add-modal-input" id="wfh-rp-empid" placeholder="Employee ID" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الإدارة / الأكونت</label>
+          <select class="add-modal-input" id="wfh-rp-dept" style="margin-bottom:0"><option value="">-- اختر --</option></select>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>رقم التليفون <span class="opt-badge">اختياري</span></label><input type="text" class="add-modal-input" id="wfh-rp-phone" placeholder="01xxxxxxxxx" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>الأجهزة اللي هتتسلم (لو مختلفة)</label>
+          <div class="wfh-device-header"><span>Serial Number</span><span>نوع الجهاز</span><span>الماركة</span><span></span></div>
+          <div id="wfh-rp-devices"></div>
+          <button type="button" class="wfh-add-device-btn" onclick="addWFHDeviceRow('replace')">+ إضافة جهاز</button>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>حالة الأجهزة المرجوعة (بواسطة IT)</label>
+          <div id="wfh-rp-conditions-list" style="margin-top:.5rem"></div>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>توقيع مسئول الشئون الإدارية</label>
+          <input type="text" class="add-modal-input" id="wfh-rp-sign" placeholder="اكتب اسمك" style="margin-bottom:0">
+        </div>
+        <div class="form-group" style="margin-top:.75rem">
+          <label>كومنت <span class="opt-badge">اختياري</span></label>
+          <textarea class="add-modal-input" id="wfh-rp-comment" placeholder="أي ملاحظات" style="min-height:80px;resize:vertical;margin-bottom:0"></textarea>
+        </div>
+        <button class="submit-btn" id="wfh-rp-submit" onclick="submitReplace()" style="margin-top:1rem">🔄 تأكيد الاستبدال</button>
+        <div class="error-box" id="wfh-rp-error"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1284,6 +1471,334 @@ async function startBulkMove(){
   document.getElementById('bulk-cancel-btn').style.display='none';
   document.getElementById('bulk-submit-btn').style.display='none';
   document.getElementById('bulk-close-wrap').style.display='block';
+}
+
+
+// ===== WFH MODULE =====
+var wfhCurrentEmployee = null; // الموظف اللي بيتعمل له إرجاع/استبدال
+var wfhCurrentOp = 'return';   // return أو replace
+
+function openWFHPage(){
+  showPage('page-wfh');
+  // ملي القوائم
+  var deptSels = ['wfh-d-dept','wfh-rp-dept'];
+  deptSels.forEach(function(id){
+    var s = document.getElementById(id);
+    if(!s) return;
+    s.innerHTML = '<option value="">-- اختر --</option>';
+    (appSettings.departments||[]).forEach(function(d){ var o=document.createElement('option'); o.value=d; o.textContent=d; s.appendChild(o); });
+  });
+  var locSel = document.getElementById('wfh-r-location');
+  if(locSel){
+    locSel.innerHTML = '<option value="">-- اختر --</option>';
+    (appSettings.sites||[]).forEach(function(s){ var o=document.createElement('option'); o.value=s; o.textContent=s; locSel.appendChild(o); });
+  }
+  // reset
+  switchWFHTab('deliver');
+  resetDeliverForm();
+  resetReturnForm();
+}
+
+function switchWFHTab(tab){
+  document.getElementById('wfh-deliver-panel').style.display = tab==='deliver' ? 'block' : 'none';
+  document.getElementById('wfh-return-panel').style.display  = tab==='return'  ? 'block' : 'none';
+  document.getElementById('wfh-tab-deliver').className = 'wfh-tab' + (tab==='deliver'?' active':'');
+  document.getElementById('wfh-tab-return').className  = 'wfh-tab' + (tab==='return' ?' active':'');
+}
+
+// ===== DELIVER =====
+function addWFHDeviceRow(panel){
+  var containerId = panel==='deliver' ? 'wfh-d-devices' : 'wfh-rp-devices';
+  var container = document.getElementById(containerId);
+  var row = document.createElement('div');
+  row.className = 'wfh-device-row';
+  var typeOpts = '<option value="">-- اختر --</option>';
+  (appSettings.deviceTypes||[]).forEach(function(t){ typeOpts += '<option value="'+t+'">'+t+'</option>'; });
+  row.innerHTML =
+    '<input type="text" placeholder="Serial Number" class="wfh-serial-inp">'+
+    '<select class="wfh-type-inp">'+typeOpts+'</select>'+
+    '<input type="text" placeholder="الماركة" class="wfh-brand-inp">'+
+    '<button type="button" class="bulk-row-del" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(row);
+  row.querySelector('.wfh-serial-inp').focus();
+  // auto-lookup
+  row.querySelector('.wfh-serial-inp').addEventListener('change', async function(){
+    var s = this.value.trim(); if(!s) return;
+    try{
+      var res = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:s, assetNumber:''});
+      if(res.success && res.device){
+        if(res.device.deviceType) row.querySelector('.wfh-type-inp').value = res.device.deviceType;
+        if(res.device.brand)      row.querySelector('.wfh-brand-inp').value = res.device.brand || '';
+      }
+    }catch(e){}
+  });
+}
+
+function resetDeliverForm(){
+  ['wfh-d-name','wfh-d-natid','wfh-d-empid','wfh-d-phone','wfh-d-sign','wfh-d-comment'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('wfh-d-dept').value = '';
+  document.getElementById('wfh-d-amana-check').checked = false;
+  document.getElementById('wfh-d-amana-details').className = 'amana-details';
+  document.getElementById('wfh-d-amana-val').value = '33000';
+  document.getElementById('wfh-d-amana-val').readOnly = true;
+  document.getElementById('wfh-d-hire-date').value = '';
+  document.getElementById('wfh-d-tenure-result').innerHTML = '';
+  document.getElementById('wfh-d-devices').innerHTML = '';
+  document.getElementById('wfh-d-error').style.display='none';
+  addWFHDeviceRow('deliver');
+}
+
+function toggleAmana(){
+  var checked = document.getElementById('wfh-d-amana-check').checked;
+  document.getElementById('wfh-d-amana-details').className = 'amana-details' + (checked?' show':'');
+}
+
+function toggleAmanaEdit(){
+  var inp = document.getElementById('wfh-d-amana-val');
+  if(inp.readOnly){ inp.readOnly=false; inp.focus(); }
+  else { inp.readOnly=true; }
+}
+
+function calcTenure(){
+  var hireDate = document.getElementById('wfh-d-hire-date').value;
+  var resultEl = document.getElementById('wfh-d-tenure-result');
+  if(!hireDate){ resultEl.innerHTML=''; return; }
+  var hire = new Date(hireDate);
+  var now  = new Date();
+  var diff = now - hire;
+  var years  = Math.floor(diff / (365.25*24*3600*1000));
+  var months = Math.floor((diff % (365.25*24*3600*1000)) / (30.44*24*3600*1000));
+  var totalMonths = years*12 + months;
+  var durationStr = years > 0 ? years+'سنة ' + (months>0?months+' شهر':'') : months+' شهر';
+  if(totalMonths >= 36){
+    resultEl.innerHTML = '<div class="amana-result ok">✅ مش هيوقع وصل أمانة — بقاله '+durationStr+' في الشركة</div>';
+  } else {
+    var remaining = 36 - totalMonths;
+    resultEl.innerHTML = '<div class="amana-result warn">⚠️ يوقع وصل أمانة — بقاله '+durationStr+' (محتاج '+remaining+' شهر لإكمال 3 سنين)</div>';
+  }
+}
+
+async function submitDeliver(){
+  var name   = document.getElementById('wfh-d-name').value.trim();
+  var natid  = document.getElementById('wfh-d-natid').value.trim();
+  var empid  = document.getElementById('wfh-d-empid').value.trim();
+  var dept   = document.getElementById('wfh-d-dept').value;
+  var phone  = document.getElementById('wfh-d-phone').value.trim();
+  var sign   = document.getElementById('wfh-d-sign').value.trim();
+  var comment= document.getElementById('wfh-d-comment').value.trim();
+  var errEl  = document.getElementById('wfh-d-error'); errEl.style.display='none';
+
+  if(!name)  { errEl.textContent='اكتب اسم الموظف';    errEl.style.display='block'; return; }
+  if(!natid) { errEl.textContent='اكتب الرقم القومي';  errEl.style.display='block'; return; }
+  if(!empid) { errEl.textContent='اكتب الرقم الوظيفي'; errEl.style.display='block'; return; }
+  if(!dept)  { errEl.textContent='اختر الإدارة';        errEl.style.display='block'; return; }
+  if(!sign)  { errEl.textContent='اكتب توقيعك';         errEl.style.display='block'; return; }
+
+  // جمع الأجهزة
+  var deviceRows = document.querySelectorAll('#wfh-d-devices .wfh-device-row');
+  var devices = [];
+  deviceRows.forEach(function(row){
+    var serial = row.querySelector('.wfh-serial-inp').value.trim();
+    var type   = row.querySelector('.wfh-type-inp').value;
+    var brand  = row.querySelector('.wfh-brand-inp').value.trim();
+    if(serial) devices.push({serial:serial, deviceType:type, brand:brand, assetNumber:''});
+  });
+  if(!devices.length){ errEl.textContent='أضف جهاز واحد على الأقل'; errEl.style.display='block'; return; }
+
+  // الأمانة
+  var amanaCheck = document.getElementById('wfh-d-amana-check').checked;
+  var amana = { value: amanaCheck ? document.getElementById('wfh-d-amana-val').value : '', signed: amanaCheck ? 'نعم' : 'لا' };
+
+  var btn = document.getElementById('wfh-d-submit');
+  btn.disabled=true; btn.textContent='جاري الحفظ...';
+
+  try {
+    var res = await api('deliverWFH', {
+      employee: { id:empid, name:name, nationalId:natid, phone:phone, department:dept },
+      devices:  devices,
+      amana:    amana,
+      comment:  comment,
+      location: currentUser.locationName,
+      processedBy: sign
+    });
+    if(res.success){
+      showToast('✅ تم التسليم! رقم العملية: '+res.operationId, 'success');
+      resetDeliverForm();
+    } else {
+      errEl.textContent = res.message || 'حدث خطأ'; errEl.style.display='block';
+    }
+  } catch(e){ errEl.textContent='خطأ: '+e.message; errEl.style.display='block'; }
+  finally { btn.disabled=false; btn.textContent='📤 تسليم الأجهزة'; }
+}
+
+// ===== RETURN / REPLACE =====
+function resetReturnForm(){
+  wfhCurrentEmployee = null;
+  document.getElementById('wfh-r-query').value = '';
+  document.getElementById('wfh-r-employee-result').style.display='none';
+  document.getElementById('wfh-r-devices-card').style.display='none';
+  document.getElementById('wfh-r-type-card').style.display='none';
+  document.getElementById('wfh-r-return-details').style.display='none';
+  document.getElementById('wfh-r-replace-details').style.display='none';
+  document.getElementById('wfh-r-error') && (document.getElementById('wfh-r-error').style.display='none');
+}
+
+async function searchWFHEmployee(){
+  var q = document.getElementById('wfh-r-query').value.trim();
+  if(!q){ showToast('اكتب رقم وظيفي أو رقم قومي', 'error'); return; }
+  try {
+    var res = await api('lookupEmployeeWFH', {query: q});
+    if(res.success && res.employee){
+      wfhCurrentEmployee = res.employee;
+      wfhCurrentEmployee.devices = res.devices;
+      // عرض بيانات الموظف
+      var empDiv = document.getElementById('wfh-r-employee-result');
+      empDiv.style.display='block';
+      empDiv.innerHTML = '<div class="wfh-lookup-result"><div class="wfh-lookup-name">'+res.employee.name+'</div><div class="wfh-lookup-meta">رقم وظيفي: '+res.employee.id+' | رقم قومي: '+res.employee.nationalId+'<br>إدارة: '+(res.employee.department||'—')+' | تليفون: '+(res.employee.phone||'—')+'</div></div>';
+      // عرض الأجهزة
+      var devCard = document.getElementById('wfh-r-devices-card');
+      var devList = document.getElementById('wfh-r-devices-list');
+      devCard.style.display='block';
+      devList.innerHTML='';
+      if(!res.devices || !res.devices.length){
+        devList.innerHTML='<div class="empty-msg">مفيش أجهزة مسجلة على الموظف ده</div>';
+      } else {
+        res.devices.forEach(function(d, i){
+          var card = document.createElement('div');
+          card.className='wfh-device-card';
+          card.innerHTML='<input type="checkbox" class="wfh-device-check" checked id="wfh-dev-chk-'+i+'" data-idx="'+i+'">'+
+            '<div class="wfh-device-info"><div class="wfh-device-serial">'+(d.serial||'—')+'</div>'+
+            '<div class="wfh-device-meta">'+(d.deviceType||'—')+' '+(d.brand||'')+'</div></div>';
+          devList.appendChild(card);
+        });
+      }
+      // عرض نوع العملية
+      document.getElementById('wfh-r-type-card').style.display='block';
+      switchReturnOp('return');
+    } else {
+      showToast('مفيش موظف عنده أجهزة WFH بالبيانات دي', 'error');
+    }
+  } catch(e){ showToast('خطأ: '+e.message, 'error'); }
+}
+
+function switchReturnOp(op){
+  wfhCurrentOp = op;
+  document.getElementById('wfh-op-return').className  = 'wfh-tab' + (op==='return' ?' active':'');
+  document.getElementById('wfh-op-replace').className = 'wfh-tab' + (op==='replace'?' active':'');
+  document.getElementById('wfh-r-return-details').style.display  = op==='return'  ? 'block' : 'none';
+  document.getElementById('wfh-r-replace-details').style.display = op==='replace' ? 'block' : 'none';
+  // لو return — ابني قائمة حالات الأجهزة
+  if(op==='return')  buildConditionsList('wfh-r-conditions-list');
+  if(op==='replace') buildConditionsList('wfh-rp-conditions-list');
+}
+
+var CONDITIONS = ['مطابق لحالة تسليمه','غير مطابق لحالة تسليمه','غير مطابق سوء استخدام','غير مطابق طبقاً للعمر الافتراضي','يعاد التشغيل','غير قابل لإعادة التشغيل'];
+
+function buildConditionsList(containerId){
+  var container = document.getElementById(containerId); if(!container) return;
+  container.innerHTML='';
+  if(!wfhCurrentEmployee || !wfhCurrentEmployee.devices) return;
+  var checkedDevices = getCheckedDevices();
+  checkedDevices.forEach(function(d, i){
+    var wrap = document.createElement('div'); wrap.className='wfh-condition-wrap';
+    var opts = CONDITIONS.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('');
+    wrap.innerHTML='<div class="wfh-device-serial">'+d.serial+' — '+(d.deviceType||'')+'</div>'+
+      '<select class="condition-select" data-serial="'+d.serial+'">'+opts+'</select>';
+    container.appendChild(wrap);
+  });
+}
+
+function getCheckedDevices(){
+  if(!wfhCurrentEmployee || !wfhCurrentEmployee.devices) return [];
+  var devices = [];
+  wfhCurrentEmployee.devices.forEach(function(d, i){
+    var chk = document.getElementById('wfh-dev-chk-'+i);
+    if(chk && chk.checked) devices.push(d);
+  });
+  return devices;
+}
+
+async function submitReturn(){
+  var location = document.getElementById('wfh-r-location').value;
+  var sign     = document.getElementById('wfh-r-sign').value.trim();
+  var comment  = document.getElementById('wfh-r-comment').value.trim();
+  var errEl    = document.getElementById('wfh-r-error'); errEl.style.display='none';
+
+  if(!location){ errEl.textContent='اختر الموقع';   errEl.style.display='block'; return; }
+  if(!sign)     { errEl.textContent='اكتب توقيعك'; errEl.style.display='block'; return; }
+
+  var checkedDevices = getCheckedDevices();
+  if(!checkedDevices.length){ errEl.textContent='اختر جهاز واحد على الأقل'; errEl.style.display='block'; return; }
+
+  // جمع حالات الأجهزة
+  var devices = checkedDevices.map(function(d){
+    var condSel = document.querySelector('#wfh-r-conditions-list [data-serial="'+d.serial+'"]');
+    return { serial:d.serial, assetNumber:d.assetNumber||'', deviceType:d.deviceType||'', brand:d.brand||'', condition: condSel ? condSel.value : '' };
+  });
+
+  var btn = document.getElementById('wfh-r-submit');
+  btn.disabled=true; btn.textContent='جاري الحفظ...';
+  try {
+    var res = await api('returnWFH', {
+      employee:   { id:wfhCurrentEmployee.id, name:wfhCurrentEmployee.name, nationalId:wfhCurrentEmployee.nationalId, phone:wfhCurrentEmployee.phone, department:wfhCurrentEmployee.department },
+      devices:    devices,
+      location:   location,
+      comment:    comment,
+      processedBy: sign
+    });
+    if(res.success){ showToast('✅ تم الإرجاع! رقم العملية: '+res.operationId, 'success'); resetReturnForm(); }
+    else { errEl.textContent=res.message||'حدث خطأ'; errEl.style.display='block'; }
+  } catch(e){ errEl.textContent='خطأ: '+e.message; errEl.style.display='block'; }
+  finally { btn.disabled=false; btn.textContent='📥 تأكيد الإرجاع'; }
+}
+
+async function submitReplace(){
+  var toName  = document.getElementById('wfh-rp-name').value.trim();
+  var toNatid = document.getElementById('wfh-rp-natid').value.trim();
+  var toEmpid = document.getElementById('wfh-rp-empid').value.trim();
+  var toDept  = document.getElementById('wfh-rp-dept').value;
+  var toPhone = document.getElementById('wfh-rp-phone').value.trim();
+  var sign    = document.getElementById('wfh-rp-sign').value.trim();
+  var comment = document.getElementById('wfh-rp-comment').value.trim();
+  var errEl   = document.getElementById('wfh-rp-error'); errEl.style.display='none';
+
+  if(!toName)  { errEl.textContent='اكتب اسم الموظف الجديد';    errEl.style.display='block'; return; }
+  if(!toNatid) { errEl.textContent='اكتب الرقم القومي للموظف الجديد'; errEl.style.display='block'; return; }
+  if(!toEmpid) { errEl.textContent='اكتب الرقم الوظيفي للموظف الجديد'; errEl.style.display='block'; return; }
+  if(!sign)    { errEl.textContent='اكتب توقيعك'; errEl.style.display='block'; return; }
+
+  var returnDevices = getCheckedDevices().map(function(d){
+    var condSel = document.querySelector('#wfh-rp-conditions-list [data-serial="'+d.serial+'"]');
+    return { serial:d.serial, assetNumber:d.assetNumber||'', deviceType:d.deviceType||'', brand:d.brand||'', condition: condSel?condSel.value:'' };
+  });
+
+  var deliverRows = document.querySelectorAll('#wfh-rp-devices .wfh-device-row');
+  var deliverDevices = [];
+  deliverRows.forEach(function(row){
+    var serial = row.querySelector('.wfh-serial-inp').value.trim();
+    var type   = row.querySelector('.wfh-type-inp').value;
+    var brand  = row.querySelector('.wfh-brand-inp').value.trim();
+    if(serial) deliverDevices.push({serial:serial, deviceType:type, brand:brand, assetNumber:''});
+  });
+  // لو مفيش أجهزة جديدة، يستخدم نفس الأجهزة المرجوعة
+  if(!deliverDevices.length) deliverDevices = returnDevices.map(function(d){ return {serial:d.serial, deviceType:d.deviceType, brand:d.brand, assetNumber:d.assetNumber}; });
+
+  var btn = document.getElementById('wfh-rp-submit');
+  btn.disabled=true; btn.textContent='جاري الحفظ...';
+  try {
+    var res = await api('replaceWFH', {
+      fromEmployee: { id:wfhCurrentEmployee.id, name:wfhCurrentEmployee.name, nationalId:wfhCurrentEmployee.nationalId, phone:wfhCurrentEmployee.phone, department:wfhCurrentEmployee.department },
+      toEmployee:   { id:toEmpid, name:toName, nationalId:toNatid, phone:toPhone, department:toDept||wfhCurrentEmployee.department },
+      returnDevices:  returnDevices,
+      deliverDevices: deliverDevices,
+      location:   currentUser.locationName,
+      comment:    comment,
+      processedBy: sign
+    });
+    if(res.success){ showToast('✅ تم الاستبدال! رقم العملية: '+res.operationId, 'success'); resetReturnForm(); }
+    else { errEl.textContent=res.message||'حدث خطأ'; errEl.style.display='block'; }
+  } catch(e){ errEl.textContent='خطأ: '+e.message; errEl.style.display='block'; }
+  finally { btn.disabled=false; btn.textContent='🔄 تأكيد الاستبدال'; }
 }
 
 // ===== INIT =====
