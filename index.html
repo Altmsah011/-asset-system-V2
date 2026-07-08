@@ -258,6 +258,10 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 .condition-select:focus{border-color:var(--primary);outline:none}
 .wfh-condition-wrap{padding:.75rem;background:var(--surface2);border-radius:10px;margin-bottom:.5rem}
 .wfh-condition-wrap .wfh-device-serial{margin-bottom:.5rem}
+.wfh-existing-box{background:var(--primary-light);border-radius:12px;padding:1rem;margin-bottom:1rem;border:1px solid var(--primary)}
+.wfh-existing-title{font-size:13px;font-weight:600;color:var(--primary-text);margin-bottom:.5rem}
+.wfh-existing-device{font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--primary-light)}
+.wfh-existing-device:last-child{border-bottom:none}
 
 @media(max-width:700px){
   .bulk-modal-card{max-width:99vw;width:99vw}
@@ -384,6 +388,13 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
       <input type="text" id="d-search" placeholder="🔍 ابحث بـ Serial أو رقم الأصل في كل المواقع..." onkeydown="if(event.key==='Enter') doSearch()">
       <button class="search-btn" onclick="doSearch()">بحث</button>
     </div>
+    <!-- تبويب: أجهزة الموقع / WFH -->
+    <div style="display:flex;gap:8px;margin-bottom:1rem">
+      <button class="filter-btn" id="devices-tab-local" onclick="switchDevicesTab('local')" style="flex:1;border-radius:10px">📍 أجهزة موقعي</button>
+      <button class="clear-btn"  id="devices-tab-wfh"   onclick="switchDevicesTab('wfh')"   style="flex:1;border-radius:10px">🏠 WFH</button>
+    </div>
+    <!-- فلتر الموقع -->
+    <div id="devices-local-panel">
     <div class="filter-bar">
       <div class="filter-bar-top">
         <div class="filter-bar-title">📍 فلتر أجهزة موقعك الحالي</div>
@@ -396,6 +407,19 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
         <select id="d-room"><option value="">كل الغرف</option></select>
         <button class="filter-btn" onclick="applyFilter()">عرض</button>
         <button class="clear-btn" onclick="showRecent()">آخر الحركات</button>
+      </div>
+    </div>
+    </div>
+    <!-- فلتر WFH -->
+    <div id="devices-wfh-panel" style="display:none">
+      <div class="filter-bar">
+        <div class="filter-bar-top">
+          <div class="filter-bar-title">🏠 أجهزة Work From Home</div>
+          <button class="sync-btn" onclick="loadWFHDevicesView()">🔄 تحديث</button>
+        </div>
+        <div class="filter-row">
+          <input type="text" id="wfh-view-search" placeholder="🔍 ابحث باسم موظف أو سيريال..." oninput="filterWFHView()" style="flex:1">
+        </div>
       </div>
     </div>
     <!-- TYPE CHIPS — تظهر بعد الفلتر -->
@@ -449,6 +473,15 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
 
     <!-- ===== صفحة التسليم ===== -->
     <div id="wfh-deliver-panel">
+      <!-- بحث سريع عن موظف موجود -->
+      <div class="wfh-card">
+        <div class="wfh-section-title">🔍 بحث سريع <span class="opt-badge">اختياري</span></div>
+        <div class="search-bar">
+          <input type="text" id="wfh-d-query" placeholder="الرقم الوظيفي أو الرقم القومي..." onkeydown="if(event.key==='Enter') searchWFHForDeliver()">
+          <button class="search-btn" onclick="searchWFHForDeliver()">بحث</button>
+        </div>
+        <div id="wfh-d-existing" style="display:none"></div>
+      </div>
       <!-- بيانات الموظف -->
       <div class="wfh-card">
         <div class="wfh-section-title">👤 بيانات الموظف</div>
@@ -547,6 +580,10 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
           <label>كومنت <span class="opt-badge">اختياري — قابل للتعديل بعدين</span></label>
           <textarea class="add-modal-input" id="wfh-r-comment" placeholder="تفاصيل حالة الجهاز أو أي ملاحظات" style="min-height:80px;resize:vertical;margin-bottom:0"></textarea>
         </div>
+        <div class="form-group" style="margin-top:.75rem">
+          <label>توقيع مسئول الدعم الفني</label>
+          <input type="text" class="add-modal-input" id="wfh-r-it-sign" placeholder="اسم مسئول IT" style="margin-bottom:0">
+        </div>
         <button class="submit-btn" id="wfh-r-submit" onclick="submitReturn()" style="margin-top:1rem">📥 تأكيد الإرجاع</button>
         <div class="error-box" id="wfh-r-error"></div>
       </div>
@@ -575,6 +612,10 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
         <div class="form-group" style="margin-top:.75rem">
           <label>كومنت <span class="opt-badge">اختياري</span></label>
           <textarea class="add-modal-input" id="wfh-rp-comment" placeholder="أي ملاحظات" style="min-height:80px;resize:vertical;margin-bottom:0"></textarea>
+        </div>
+        <div class="form-group" style="margin-top:.75rem">
+          <label>توقيع مسئول الدعم الفني</label>
+          <input type="text" class="add-modal-input" id="wfh-rp-it-sign" placeholder="اسم مسئول IT" style="margin-bottom:0">
         </div>
         <button class="submit-btn" id="wfh-rp-submit" onclick="submitReplace()" style="margin-top:1rem">🔄 تأكيد الاستبدال</button>
         <div class="error-box" id="wfh-rp-error"></div>
@@ -761,7 +802,16 @@ function showHome(){
   document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = currentUser.role==='admin'?'block':'none'; });
   showPage('page-home');
 }
-async function loadSettings(){ try{ var r=await api('getSettings',{spreadsheetId:currentUser.spreadsheetId}); if(r.success) appSettings=r.data; }catch(e){} }
+async function loadSettings(){
+  try{
+    var r=await api('getSettings',{spreadsheetId:currentUser.spreadsheetId});
+    if(r.success) appSettings=r.data;
+  }catch(e){}
+  try{
+    var rb=await api('getBrands',{});
+    if(rb.success) appSettings.brands=rb.data;
+  }catch(e){ appSettings.brands=['HP','Dell','Lenovo','Fujitsu','Huawei','Samsung','LG','Acer']; }
+}
 
 // ===== MOVEMENT =====
 async function openMovementPage(){ showPage('page-movement'); populateMovementSelects(); resetMovementForm(); }
@@ -792,6 +842,29 @@ function onFieldChange(){
 async function triggerLookup(serial, asset){
   lastSerial=serial; lastAsset=asset;
   try {
+    // أولاً تحقق هل الجهاز في WFH
+    if(serial){
+      var wfhRes = await api('checkDeviceWFH',{serial:serial});
+      if(wfhRes.success && wfhRes.isWFH){
+        var emp = wfhRes.employee;
+        var dev = wfhRes.device;
+        autoFilled=true;
+        if(dev.serial)      document.getElementById('m-serial').value     = dev.serial;
+        if(dev.assetNumber) document.getElementById('m-asset').value      = dev.assetNumber;
+        if(dev.deviceType)  document.getElementById('m-deviceType').value = dev.deviceType;
+        if(emp.department)  document.getElementById('m-department').value = emp.department;
+        // مكان "من" — اعرض WFH ببيانات الموظف
+        document.getElementById('m-fromLocation').value = 'WFH';
+        document.getElementById('m-fromFloor').value    = '';
+        document.getElementById('m-fromRoom').value     = '';
+        document.getElementById('m-fromSeatNum').value  = '';
+        document.getElementById('m-fromSeatLetter').value = '';
+        // رسالة تحذير
+        showMovWFHWarning(emp);
+        return;
+      }
+    }
+    // بحث عادي
     var res = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:serial, assetNumber:asset});
     if(res.success&&res.device){
       var d=res.device;
@@ -799,6 +872,7 @@ async function triggerLookup(serial, asset){
       var am = asset  && d.assetNumber && asset.trim().toLowerCase()===d.assetNumber.toString().trim().toLowerCase();
       if(!sm&&!am) return;
       autoFilled=true;
+      hideMovWFHWarning();
       if(d.serial)          document.getElementById('m-serial').value       = d.serial;
       if(d.assetNumber)     document.getElementById('m-asset').value        = d.assetNumber;
       if(d.deviceType)      document.getElementById('m-deviceType').value   = d.deviceType;
@@ -809,6 +883,26 @@ async function triggerLookup(serial, asset){
       if(d.seatLetter) document.getElementById('m-fromSeatLetter').value = d.seatLetter;
     }
   } catch(e){}
+}
+
+function showMovWFHWarning(emp){
+  var existing = document.getElementById('mov-wfh-warning');
+  if(!existing){
+    var div = document.createElement('div');
+    div.id='mov-wfh-warning';
+    div.style.cssText='background:var(--warning)20;border:1px solid var(--warning);border-radius:10px;padding:10px 14px;margin-bottom:1rem;font-size:13px;color:var(--text)';
+    div.innerHTML='⚠️ الجهاز ده موجود على عهدة WFH — <strong>'+emp.name+'</strong> ('+emp.id+')<br>لازم تعمل إرجاع WFH الأول، أو تسجل الحركة وتضيف رقم تيكت لو الجهاز اترجع فعلاً.';
+    var section = document.querySelector('#page-movement .section');
+    if(section) section.parentNode.insertBefore(div, section);
+  } else {
+    existing.innerHTML='⚠️ الجهاز ده موجود على عهدة WFH — <strong>'+emp.name+'</strong> ('+emp.id+')<br>لازم تعمل إرجاع WFH الأول، أو تسجل الحركة وتضيف رقم تيكت لو الجهاز اترجع فعلاً.';
+    existing.style.display='block';
+  }
+}
+
+function hideMovWFHWarning(){
+  var el = document.getElementById('mov-wfh-warning');
+  if(el) el.style.display='none';
 }
 function clearAutoFilled(){ autoFilled=false; lastSerial=''; lastAsset=''; ['m-asset','m-deviceType','m-department','m-fromLocation','m-fromFloor','m-fromRoom','m-fromSeatNum','m-fromSeatLetter'].forEach(function(id){ document.getElementById(id).value=''; }); }
 
@@ -1106,6 +1200,24 @@ async function confirmAdd(){
       }
       showToast('✅ تمت إضافة الإدارة', 'success');
     } catch(e){ showToast('❌ '+e.message,'error'); }
+    return;
+  }
+  if(type==='brand'){
+    try{
+      await api('addBrand',{brandName:value});
+      if(!appSettings.brands) appSettings.brands=[];
+      appSettings.brands.push(value);
+      // حدّث كل قوائم الماركات في صفحة WFH
+      document.querySelectorAll('.wfh-brand-inp').forEach(function(sel){
+        var o=document.createElement('option'); o.value=value; o.textContent=value; sel.appendChild(o);
+      });
+      // اختار القيمة في الصف اللي ضغط منه +
+      if(addModalMeta.btnEl){
+        var theRow = addModalMeta.btnEl.closest('.wfh-device-row');
+        if(theRow) theRow.querySelector('.wfh-brand-inp').value = value;
+      }
+      showToast('✅ تمت إضافة الماركة', 'success');
+    }catch(e){ showToast('❌ '+e.message,'error'); }
     return;
   }
   try {
@@ -1514,24 +1626,49 @@ function addWFHDeviceRow(panel){
   row.className = 'wfh-device-row';
   var typeOpts = '<option value="">-- اختر --</option>';
   (appSettings.deviceTypes||[]).forEach(function(t){ typeOpts += '<option value="'+t+'">'+t+'</option>'; });
+  var brandOpts = '<option value="">-- اختر --</option>';
+  (appSettings.brands||['HP','Dell','Lenovo','Fujitsu','Huawei','Samsung','LG','Acer']).forEach(function(b){ brandOpts += '<option value="'+b+'">'+b+'</option>'; });
   row.innerHTML =
     '<input type="text" placeholder="Serial Number" class="wfh-serial-inp">'+
     '<select class="wfh-type-inp">'+typeOpts+'</select>'+
-    '<input type="text" placeholder="الماركة" class="wfh-brand-inp">'+
+    '<div style="display:flex;gap:4px;align-items:center">'+
+      '<select class="wfh-brand-inp" style="flex:1">'+brandOpts+'</select>'+
+      '<button type="button" class="bulk-dept-add-btn" title="إضافة ماركة جديدة" onclick="openAddBrandModal(this)">+</button>'+
+    '</div>'+
     '<button type="button" class="bulk-row-del" onclick="this.parentElement.remove()">✕</button>';
   container.appendChild(row);
   row.querySelector('.wfh-serial-inp').focus();
-  // auto-lookup
+  // auto-lookup — لو السيريال موجود في WFH يظهر تحذير
   row.querySelector('.wfh-serial-inp').addEventListener('change', async function(){
     var s = this.value.trim(); if(!s) return;
     try{
+      // أولاً تحقق من WFH
+      var wfhRes = await api('checkDeviceWFH',{serial:s});
+      if(wfhRes.success && wfhRes.isWFH){
+        showToast('⚠️ الجهاز '+s+' موجود على عهدة '+wfhRes.employee.name+' — لازم ترجعه الأول!', 'error');
+        this.value=''; return;
+      }
+      // بعدين جيب بياناته
       var res = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:s, assetNumber:''});
       if(res.success && res.device){
         if(res.device.deviceType) row.querySelector('.wfh-type-inp').value = res.device.deviceType;
-        if(res.device.brand)      row.querySelector('.wfh-brand-inp').value = res.device.brand || '';
+        if(res.device.brand){
+          var brandSel = row.querySelector('.wfh-brand-inp');
+          var exists = Array.from(brandSel.options).some(function(o){ return o.value===res.device.brand; });
+          if(!exists){ var o=document.createElement('option'); o.value=res.device.brand; o.textContent=res.device.brand; brandSel.appendChild(o); }
+          brandSel.value = res.device.brand;
+        }
       }
     }catch(e){}
   });
+}
+
+function openAddBrandModal(btnEl){
+  addModalMeta = {type:'brand', btnEl:btnEl};
+  document.getElementById('add-modal-title').textContent = 'إضافة ماركة جديدة';
+  document.getElementById('add-modal-input').value = '';
+  document.getElementById('add-modal').classList.add('show');
+  setTimeout(function(){ document.getElementById('add-modal-input').focus(); }, 100);
 }
 
 function resetDeliverForm(){
@@ -1699,13 +1836,25 @@ function buildConditionsList(containerId){
   container.innerHTML='';
   if(!wfhCurrentEmployee || !wfhCurrentEmployee.devices) return;
   var checkedDevices = getCheckedDevices();
-  checkedDevices.forEach(function(d, i){
+  checkedDevices.forEach(function(d){
     var wrap = document.createElement('div'); wrap.className='wfh-condition-wrap';
-    var opts = CONDITIONS.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('');
-    wrap.innerHTML='<div class="wfh-device-serial">'+d.serial+' — '+(d.deviceType||'')+'</div>'+
-      '<select class="condition-select" data-serial="'+d.serial+'">'+opts+'</select>';
+    var checkboxes = CONDITIONS.map(function(c, ci){
+      var cid = 'cond-'+d.serial.replace(/[^a-z0-9]/gi,'')+'-'+ci;
+      return '<label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px;cursor:pointer">'+
+        '<input type="checkbox" id="'+cid+'" value="'+c+'" data-serial="'+d.serial+'" class="cond-check" style="width:16px;height:16px;accent-color:var(--primary)">'+
+        c+'</label>';
+    }).join('');
+    wrap.innerHTML='<div class="wfh-device-serial" style="margin-bottom:.5rem">'+d.serial+' — '+(d.deviceType||'')+'</div>'+checkboxes;
     container.appendChild(wrap);
   });
+}
+
+// جيب حالات جهاز معين (ممكن أكتر من حالة)
+function getDeviceConditions(serial){
+  var checks = document.querySelectorAll('.cond-check[data-serial="'+serial+'"]');
+  var selected = [];
+  checks.forEach(function(c){ if(c.checked) selected.push(c.value); });
+  return selected.join(' + ');
 }
 
 function getCheckedDevices(){
@@ -1721,21 +1870,25 @@ function getCheckedDevices(){
 async function submitReturn(){
   var location = document.getElementById('wfh-r-location').value;
   var sign     = document.getElementById('wfh-r-sign').value.trim();
+  var itSign   = document.getElementById('wfh-r-it-sign').value.trim();
   var comment  = document.getElementById('wfh-r-comment').value.trim();
   var errEl    = document.getElementById('wfh-r-error'); errEl.style.display='none';
 
   if(!location){ errEl.textContent='اختر الموقع';   errEl.style.display='block'; return; }
-  if(!sign)     { errEl.textContent='اكتب توقيعك'; errEl.style.display='block'; return; }
+  if(!sign)     { errEl.textContent='اكتب توقيعك';  errEl.style.display='block'; return; }
 
   var checkedDevices = getCheckedDevices();
   if(!checkedDevices.length){ errEl.textContent='اختر جهاز واحد على الأقل'; errEl.style.display='block'; return; }
 
-  // جمع حالات الأجهزة
+  // جمع حالات الأجهزة (أكتر من حالة)
   var devices = checkedDevices.map(function(d){
-    var condSel = document.querySelector('#wfh-r-conditions-list [data-serial="'+d.serial+'"]');
-    return { serial:d.serial, assetNumber:d.assetNumber||'', deviceType:d.deviceType||'', brand:d.brand||'', condition: condSel ? condSel.value : '' };
+    return {
+      serial:d.serial, assetNumber:d.assetNumber||'', deviceType:d.deviceType||'', brand:d.brand||'',
+      condition: getDeviceConditions(d.serial)
+    };
   });
 
+  var fullComment = comment + (itSign ? ' | دعم فني: '+itSign : '');
   var btn = document.getElementById('wfh-r-submit');
   btn.disabled=true; btn.textContent='جاري الحفظ...';
   try {
@@ -1743,7 +1896,7 @@ async function submitReturn(){
       employee:   { id:wfhCurrentEmployee.id, name:wfhCurrentEmployee.name, nationalId:wfhCurrentEmployee.nationalId, phone:wfhCurrentEmployee.phone, department:wfhCurrentEmployee.department },
       devices:    devices,
       location:   location,
-      comment:    comment,
+      comment:    fullComment,
       processedBy: sign
     });
     if(res.success){ showToast('✅ تم الإرجاع! رقم العملية: '+res.operationId, 'success'); resetReturnForm(); }
@@ -1801,6 +1954,109 @@ async function submitReplace(){
   finally { btn.disabled=false; btn.textContent='🔄 تأكيد الاستبدال'; }
 }
 
+
+// ===== ملاحظة 2: بحث موظف في فورم التسليم =====
+async function searchWFHForDeliver(){
+  var q = document.getElementById('wfh-d-query').value.trim();
+  if(!q) return;
+  try{
+    var res = await api('lookupEmployeeWFH',{query:q});
+    var existingDiv = document.getElementById('wfh-d-existing');
+    if(res.success && res.employee){
+      var emp = res.employee;
+      // ملي الحقول تلقائياً
+      document.getElementById('wfh-d-name').value  = emp.name  || '';
+      document.getElementById('wfh-d-natid').value = emp.nationalId || '';
+      document.getElementById('wfh-d-empid').value = emp.id    || '';
+      document.getElementById('wfh-d-phone').value = emp.phone || '';
+      if(emp.department) document.getElementById('wfh-d-dept').value = emp.department;
+      // عرض الأجهزة الحالية على الموظف
+      existingDiv.style.display='block';
+      var devHtml = '<div class="wfh-existing-box"><div class="wfh-existing-title">📦 أجهزة موجودة على عهدته حالياً ('+(res.devices?res.devices.length:0)+'):</div>';
+      if(res.devices && res.devices.length){
+        res.devices.forEach(function(d){
+          devHtml += '<div class="wfh-existing-device">• '+(d.deviceType||'—')+' | '+d.serial+(d.brand?' | '+d.brand:'')+'</div>';
+        });
+      } else {
+        devHtml += '<div style="font-size:13px;color:var(--text3)">مفيش أجهزة حالياً</div>';
+      }
+      devHtml += '</div>';
+      existingDiv.innerHTML = devHtml;
+      showToast('✅ تم ملء بيانات الموظف', 'success');
+    } else {
+      existingDiv.style.display='none';
+      showToast('مفيش بيانات موجودة لهذا الموظف — هتتسجل لأول مرة', 'success');
+    }
+  }catch(e){ showToast('خطأ: '+e.message,'error'); }
+}
+
+// ===== ملاحظة 7: تبديل تبويب الأجهزة =====
+var currentDevicesTab = 'local';
+var wfhDevicesAll = [];
+
+function switchDevicesTab(tab){
+  currentDevicesTab = tab;
+  document.getElementById('devices-tab-local').className = tab==='local' ? 'filter-btn' : 'clear-btn';
+  document.getElementById('devices-tab-local').style.flex = '1';
+  document.getElementById('devices-tab-local').style.borderRadius = '10px';
+  document.getElementById('devices-tab-wfh').className  = tab==='wfh'   ? 'filter-btn' : 'clear-btn';
+  document.getElementById('devices-tab-wfh').style.flex = '1';
+  document.getElementById('devices-tab-wfh').style.borderRadius = '10px';
+  document.getElementById('devices-local-panel').style.display = tab==='local' ? 'block' : 'none';
+  document.getElementById('devices-wfh-panel').style.display   = tab==='wfh'   ? 'block' : 'none';
+  // إخفاء/إظهار الجدول الأساسي
+  document.getElementById('type-chips-bar').style.display = 'none';
+  document.getElementById('stats-bar').innerHTML = '';
+  if(tab==='local'){
+    showRecent();
+  } else {
+    loadWFHDevicesView();
+  }
+}
+
+async function loadWFHDevicesView(){
+  setTableLabel('⏳ جاري التحميل...'); showTableLoading();
+  try{
+    var res = await api('getAllWFHDevicesFull',{});
+    wfhDevicesAll = (res.success && res.data) ? res.data : [];
+    renderWFHDevicesTable(wfhDevicesAll);
+    setTableLabel('🏠 أجهزة WFH — '+wfhDevicesAll.length+' جهاز');
+  }catch(e){ setTableLabel('خطأ'); showTableEmpty(); }
+}
+
+function filterWFHView(){
+  var q = (document.getElementById('wfh-view-search').value||'').trim().toLowerCase();
+  if(!q){ renderWFHDevicesTable(wfhDevicesAll); return; }
+  var filtered = wfhDevicesAll.filter(function(d){
+    return (d.serial_number||'').toLowerCase().includes(q) ||
+           (d.employee_name||'').toLowerCase().includes(q) ||
+           (d.employee_id||'').toString().includes(q) ||
+           (d.device_type||'').toLowerCase().includes(q);
+  });
+  renderWFHDevicesTable(filtered);
+  setTableLabel('🔍 '+filtered.length+' نتيجة');
+}
+
+function renderWFHDevicesTable(rows){
+  updateStats(rows.map(function(r){ return {device_type:r.device_type}; }));
+  if(!rows.length){ showTableEmpty(); return; }
+  var tbody=document.getElementById('d-body');
+  document.getElementById('d-empty').style.display='none';
+  document.getElementById('d-loading').style.display='none';
+  document.getElementById('d-table').style.display='table';
+  // حدّث الهيدر مؤقتاً
+  document.querySelector('#d-table thead tr').innerHTML='<th>#</th><th>Serial</th><th>نوع الجهاز</th><th>الماركة</th><th>الإدارة</th><th>اسم الموظف</th><th>رقم وظيفي</th><th>رقم قومي</th><th>تليفون</th><th>تاريخ التسليم</th><th>أمانة</th>';
+  tbody.innerHTML='';
+  rows.forEach(function(d,i){
+    var dt = d.delivery_date ? new Date(d.delivery_date).toLocaleDateString('ar-EG') : '—';
+    var tr=document.createElement('tr'); tr.className='device-row';
+    tr.innerHTML='<td>'+(i+1)+'</td><td>'+(d.serial_number||'—')+'</td><td>'+(d.device_type||'—')+'</td><td>'+(d.brand||'—')+'</td><td>'+(d.department||'—')+'</td><td>'+(d.employee_name||'—')+'</td><td>'+(d.employee_id||'—')+'</td><td>'+(d.national_id||'—')+'</td><td>'+(d.phone||'—')+'</td><td>'+dt+'</td><td>'+(d.amana_signed==='نعم'?'✅':'—')+'</td>';
+    tbody.appendChild(tr);
+  });
+  syncScrollTop();
+}
+
+// ===== تحديث submitReturn ليستخدم getDeviceConditions وتوقيع IT =====
 // ===== INIT =====
 loadTheme();
 var savedUser=loadSession();
