@@ -493,6 +493,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
         </div>
         <div class="form-group" style="margin-top:.75rem"><label>رقم التليفون <span class="opt-badge">اختياري</span></label><input type="text" class="add-modal-input" id="wfh-d-phone" placeholder="01xxxxxxxxx" style="margin-bottom:0"></div>
         <div class="form-group" style="margin-top:.75rem"><label>توقيع مسئول الشئون الإدارية</label><input type="text" class="add-modal-input" id="wfh-d-sign" placeholder="اكتب اسمك" style="margin-bottom:0"></div>
+        <div class="form-group" style="margin-top:.75rem"><label>توقيع مسئول الدعم الفني <span class="opt-badge">اختياري</span></label><input type="text" class="add-modal-input" id="wfh-d-it-sign" placeholder="اسم مسئول IT" style="margin-bottom:0"></div>
       </div>
 
       <!-- الأجهزة -->
@@ -1638,8 +1639,13 @@ function addWFHDeviceRow(panel){
     '<button type="button" class="bulk-row-del" onclick="this.parentElement.remove()">✕</button>';
   container.appendChild(row);
   row.querySelector('.wfh-serial-inp').focus();
-  // auto-lookup — لو السيريال موجود في WFH يظهر تحذير
-  row.querySelector('.wfh-serial-inp').addEventListener('change', async function(){
+  // auto-lookup — يشتغل تلقائياً لما تكتب (debounce 600ms)
+  var wfhLookupTimer = null;
+  row.querySelector('.wfh-serial-inp').addEventListener('input', function(){
+    var inp = this;
+    clearTimeout(wfhLookupTimer);
+    if(!inp.value.trim()) return;
+    wfhLookupTimer = setTimeout(async function(){
     var s = this.value.trim(); if(!s) return;
     try{
       // أولاً تحقق من WFH
@@ -1660,6 +1666,7 @@ function addWFHDeviceRow(panel){
         }
       }
     }catch(e){}
+    }, 600);
   });
 }
 
@@ -1813,9 +1820,59 @@ async function searchWFHEmployee(){
       document.getElementById('wfh-r-type-card').style.display='block';
       switchReturnOp('return');
     } else {
-      showToast('مفيش موظف عنده أجهزة WFH بالبيانات دي', 'error');
+      wfhCurrentEmployee = null;
+      showManualReturnForm(document.getElementById('wfh-r-query').value.trim());
     }
   } catch(e){ showToast('خطأ: '+e.message, 'error'); }
+}
+
+function showManualReturnForm(query){
+  var empDiv = document.getElementById('wfh-r-employee-result');
+  empDiv.style.display='block';
+  empDiv.innerHTML = '<div style="background:var(--warning)20;border:1px solid var(--warning);border-radius:10px;padding:.75rem 1rem;font-size:13px;color:var(--text);margin-bottom:.5rem">⚠️ الموظف مش موجود في النظام — هتكتب البيانات يدوي</div>'+
+    '<div class="wfh-card" style="margin-bottom:0">'+
+      '<div class="form-group"><label>اسم الموظف</label><input type="text" class="add-modal-input" id="wfh-r-manual-name" placeholder="الاسم كامل" style="margin-bottom:0"></div>'+
+      '<div class="form-group" style="margin-top:.75rem"><label>الرقم الوظيفي</label><input type="text" class="add-modal-input" id="wfh-r-manual-empid" value="'+query+'" style="margin-bottom:0"></div>'+
+      '<div class="form-group" style="margin-top:.75rem"><label>الرقم القومي</label><input type="text" class="add-modal-input" id="wfh-r-manual-natid" placeholder="رقم البطاقة" style="margin-bottom:0"></div>'+
+      '<div class="form-group" style="margin-top:.75rem"><label>رقم التليفون <span class="opt-badge">اختياري</span></label><input type="text" class="add-modal-input" id="wfh-r-manual-phone" style="margin-bottom:0"></div>'+
+      '<div class="form-group" style="margin-top:.75rem"><label>الإدارة/الأكونت</label><select class="add-modal-input" id="wfh-r-manual-dept" style="margin-bottom:0"><option value="">-- اختر --</option></select></div>'+
+    '</div>';
+  var deptSel = document.getElementById('wfh-r-manual-dept');
+  (appSettings.departments||[]).forEach(function(d){ var o=document.createElement('option'); o.value=d; o.textContent=d; deptSel.appendChild(o); });
+  var devCard = document.getElementById('wfh-r-devices-card');
+  var devList = document.getElementById('wfh-r-devices-list');
+  devCard.style.display='block';
+  devCard.querySelector('.wfh-section-title').textContent = '📦 أضف الأجهزة اللي هترجع يدوياً';
+  devList.innerHTML = '<div id="wfh-r-manual-devices"></div>'+
+    '<button type="button" class="wfh-add-device-btn" onclick="addManualReturnDevice()">+ إضافة جهاز</button>';
+  addManualReturnDevice();
+  document.getElementById('wfh-r-type-card').style.display='block';
+  switchReturnOp('return');
+  wfhCurrentEmployee = {manual:true};
+}
+
+function addManualReturnDevice(){
+  var container = document.getElementById('wfh-r-manual-devices');
+  var row = document.createElement('div'); row.className='wfh-device-row';
+  var typeOpts = '<option value="">-- اختر --</option>';
+  (appSettings.deviceTypes||[]).forEach(function(t){ typeOpts += '<option value="'+t+'">'+t+'</option>'; });
+  row.innerHTML =
+    '<input type="text" placeholder="Serial Number" class="wfh-manual-serial">'+
+    '<select class="wfh-manual-type">'+typeOpts+'</select>'+
+    '<input type="text" placeholder="الماركة" class="wfh-manual-brand">'+
+    '<button type="button" class="bulk-row-del" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(row);
+  row.querySelector('.wfh-manual-serial').focus();
+  row.querySelector('.wfh-manual-serial').addEventListener('change', async function(){
+    var s = this.value.trim(); if(!s) return;
+    try{
+      var res = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:s, assetNumber:''});
+      if(res.success && res.device){
+        if(res.device.deviceType) row.querySelector('.wfh-manual-type').value = res.device.deviceType;
+        if(res.device.brand)      row.querySelector('.wfh-manual-brand').value = res.device.brand||'';
+      }
+    }catch(e){}
+  });
 }
 
 function switchReturnOp(op){
@@ -1851,10 +1908,13 @@ function buildConditionsList(containerId){
 
 // جيب حالات جهاز معين (ممكن أكتر من حالة)
 function getDeviceConditions(serial){
-  var checks = document.querySelectorAll('.cond-check[data-serial="'+serial+'"]');
   var selected = [];
-  checks.forEach(function(c){ if(c.checked) selected.push(c.value); });
-  return selected.join(' + ');
+  document.querySelectorAll('input[type="checkbox"].cond-check').forEach(function(c){
+    if(c.getAttribute('data-serial') === serial && c.checked){
+      selected.push(c.value);
+    }
+  });
+  return selected.length ? selected.join(' + ') : '';
 }
 
 function getCheckedDevices(){
@@ -1874,29 +1934,49 @@ async function submitReturn(){
   var comment  = document.getElementById('wfh-r-comment').value.trim();
   var errEl    = document.getElementById('wfh-r-error'); errEl.style.display='none';
 
-  if(!location){ errEl.textContent='اختر الموقع';   errEl.style.display='block'; return; }
-  if(!sign)     { errEl.textContent='اكتب توقيعك';  errEl.style.display='block'; return; }
+  if(!location){ errEl.textContent='اختر الموقع';  errEl.style.display='block'; return; }
+  if(!sign)     { errEl.textContent='اكتب توقيعك'; errEl.style.display='block'; return; }
 
-  var checkedDevices = getCheckedDevices();
-  if(!checkedDevices.length){ errEl.textContent='اختر جهاز واحد على الأقل'; errEl.style.display='block'; return; }
+  var employee, devices;
 
-  // جمع حالات الأجهزة (أكتر من حالة)
-  var devices = checkedDevices.map(function(d){
-    return {
-      serial:d.serial, assetNumber:d.assetNumber||'', deviceType:d.deviceType||'', brand:d.brand||'',
-      condition: getDeviceConditions(d.serial)
-    };
-  });
+  if(wfhCurrentEmployee && wfhCurrentEmployee.manual){
+    // ===== Manual mode: إدخال يدوي =====
+    var mName  = (document.getElementById('wfh-r-manual-name')  ||{value:''}).value.trim();
+    var mEmpid = (document.getElementById('wfh-r-manual-empid') ||{value:''}).value.trim();
+    var mNatid = (document.getElementById('wfh-r-manual-natid') ||{value:''}).value.trim();
+    var mPhone = (document.getElementById('wfh-r-manual-phone') ||{value:''}).value.trim();
+    var mDept  = (document.getElementById('wfh-r-manual-dept')  ||{value:''}).value;
+    if(!mName){ errEl.textContent='اكتب اسم الموظف'; errEl.style.display='block'; return; }
+    employee = { id:mEmpid, name:mName, nationalId:mNatid, phone:mPhone, department:mDept };
+    // جمع الأجهزة اليدوية
+    var manualRows = document.querySelectorAll('#wfh-r-manual-devices .wfh-device-row');
+    devices = [];
+    manualRows.forEach(function(row){
+      var serial = row.querySelector('.wfh-manual-serial').value.trim();
+      var type   = row.querySelector('.wfh-manual-type').value;
+      var brand  = row.querySelector('.wfh-manual-brand').value.trim();
+      if(serial) devices.push({serial:serial, deviceType:type, brand:brand, assetNumber:'', condition: getDeviceConditions(serial)});
+    });
+    if(!devices.length){ errEl.textContent='أضف جهاز واحد على الأقل'; errEl.style.display='block'; return; }
+  } else {
+    // ===== Normal mode: موظف موجود في النظام =====
+    employee = { id:wfhCurrentEmployee.id, name:wfhCurrentEmployee.name, nationalId:wfhCurrentEmployee.nationalId, phone:wfhCurrentEmployee.phone, department:wfhCurrentEmployee.department };
+    var checkedDevices = getCheckedDevices();
+    if(!checkedDevices.length){ errEl.textContent='اختر جهاز واحد على الأقل'; errEl.style.display='block'; return; }
+    devices = checkedDevices.map(function(d){
+      return { serial:d.serial, assetNumber:d.assetNumber||'', deviceType:d.deviceType||'', brand:d.brand||'', condition:getDeviceConditions(d.serial) };
+    });
+  }
 
   var fullComment = comment + (itSign ? ' | دعم فني: '+itSign : '');
   var btn = document.getElementById('wfh-r-submit');
   btn.disabled=true; btn.textContent='جاري الحفظ...';
   try {
     var res = await api('returnWFH', {
-      employee:   { id:wfhCurrentEmployee.id, name:wfhCurrentEmployee.name, nationalId:wfhCurrentEmployee.nationalId, phone:wfhCurrentEmployee.phone, department:wfhCurrentEmployee.department },
-      devices:    devices,
-      location:   location,
-      comment:    fullComment,
+      employee:    employee,
+      devices:     devices,
+      location:    location,
+      comment:     fullComment,
       processedBy: sign
     });
     if(res.success){ showToast('✅ تم الإرجاع! رقم العملية: '+res.operationId, 'success'); resetReturnForm(); }
@@ -2061,6 +2141,14 @@ function renderWFHDevicesTable(rows){
 loadTheme();
 var savedUser=loadSession();
 if(savedUser){ currentUser=savedUser; loadSettings().then(function(){ showHome(); }); }
+
+// تزامن تلقائي كل 30 ثانية في الخلفية (صامت)
+setInterval(function(){
+  if(!currentUser) return;
+  api('syncAllBranches',{}).then(function(r){
+    if(!r.success) console.log('Auto-sync error:', r.message);
+  }).catch(function(e){ console.log('Auto-sync failed:', e.message); });
+}, 30000);
 </script>
 </body>
 </html>
