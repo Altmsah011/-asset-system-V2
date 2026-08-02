@@ -568,7 +568,13 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--text);wh
       <div class="wfh-card" id="wfh-r-return-details" style="display:none">
         <div class="wfh-section-title">📍 بيانات الإرجاع</div>
         <div class="form-group"><label>الموقع اللي تم فيه الإرجاع</label>
-          <select class="add-modal-input" id="wfh-r-location" style="margin-bottom:0"><option value="">-- اختر --</option></select>
+          <select class="add-modal-input" id="wfh-r-location" style="margin-bottom:0" disabled></select>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>الدور</label>
+          <select class="add-modal-input" id="wfh-r-floor" style="margin-bottom:0" onchange="filterReturnRooms()"><option value="">-- اختر --</option></select>
+        </div>
+        <div class="form-group" style="margin-top:.75rem"><label>الصالة / الغرفة</label>
+          <select class="add-modal-input" id="wfh-r-room" style="margin-bottom:0"><option value="">-- اختر --</option></select>
         </div>
         <div class="form-group" style="margin-top:.75rem"><label>توقيع مسئول الشئون الإدارية</label>
           <input type="text" class="add-modal-input" id="wfh-r-sign" placeholder="اكتب اسمك" style="margin-bottom:0">
@@ -830,6 +836,13 @@ function fillSelect(id, items){ var s=document.getElementById(id), p=s.value; s.
 function fillSelectFloors(id, floors){ var s=document.getElementById(id); s.innerHTML='<option value="">-- اختر --</option>'; floors.forEach(function(f){ var o=document.createElement('option'); o.value=f; o.textContent=f; s.appendChild(o); }); }
 function filterRooms(prefix){ var floor=document.getElementById('m-'+prefix+'Floor').value, sel=document.getElementById('m-'+prefix+'Room'); sel.innerHTML='<option value="">-- اختر --</option>'; (appSettings.rooms||[]).filter(function(r){ return !floor||r.floor===floor; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; sel.appendChild(o); }); }
 function fillSeats(nId,lId){ var n=document.getElementById(nId); n.innerHTML='<option value="">--</option>'; for(var i=1;i<=50;i++){ var o=document.createElement('option'); o.value=i; o.textContent=i; n.appendChild(o); } var l=document.getElementById(lId); l.innerHTML='<option value="">--</option>'; for(var c=65;c<=90;c++){ var o2=document.createElement('option'); o2.value=String.fromCharCode(c); o2.textContent=String.fromCharCode(c); l.appendChild(o2); } }
+
+// ===== إرجاع WFH — فلترة الغرف حسب الدور =====
+function filterReturnRooms(){
+  var floor = document.getElementById('wfh-r-floor').value, sel = document.getElementById('wfh-r-room');
+  sel.innerHTML = '<option value="">-- اختر --</option>';
+  (appSettings.rooms||[]).filter(function(r){ return !floor||r.floor===floor; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; sel.appendChild(o); });
+}
 
 function onSerialInput(){ if(!document.getElementById('m-serial').value.trim()&&autoFilled) clearAutoFilled(); }
 function onAssetInput(){  if(!document.getElementById('m-asset').value.trim()&&autoFilled)  clearAutoFilled(); }
@@ -1601,11 +1614,19 @@ function openWFHPage(){
     s.innerHTML = '<option value="">-- اختر --</option>';
     (appSettings.departments||[]).forEach(function(d){ var o=document.createElement('option'); o.value=d; o.textContent=d; s.appendChild(o); });
   });
+  // الموقع اللي تم فيه الإرجاع = فرع المستخدم الحالي تلقائياً (مش قابل للتغيير)
   var locSel = document.getElementById('wfh-r-location');
   if(locSel){
-    locSel.innerHTML = '<option value="">-- اختر --</option>';
-    (appSettings.sites||[]).forEach(function(s){ var o=document.createElement('option'); o.value=s; o.textContent=s; locSel.appendChild(o); });
+    locSel.innerHTML = '<option value="'+currentUser.locationName+'">'+currentUser.locationName+'</option>';
+    locSel.value = currentUser.locationName;
   }
+  var floorSelR = document.getElementById('wfh-r-floor');
+  if(floorSelR){
+    floorSelR.innerHTML = '<option value="">-- اختر --</option>';
+    (appSettings.floors||[]).forEach(function(f){ var o=document.createElement('option'); o.value=f; o.textContent=f; floorSelR.appendChild(o); });
+  }
+  var roomSelR = document.getElementById('wfh-r-room');
+  if(roomSelR) roomSelR.innerHTML = '<option value="">-- اختر --</option>';
   // reset
   switchWFHTab('deliver');
   resetDeliverForm();
@@ -1928,13 +1949,16 @@ function getCheckedDevices(){
 }
 
 async function submitReturn(){
-  var location = document.getElementById('wfh-r-location').value;
+  var location = document.getElementById('wfh-r-location').value || currentUser.locationName;
+  var floor    = document.getElementById('wfh-r-floor').value;
+  var room     = document.getElementById('wfh-r-room').value;
   var sign     = document.getElementById('wfh-r-sign').value.trim();
   var itSign   = document.getElementById('wfh-r-it-sign').value.trim();
   var comment  = document.getElementById('wfh-r-comment').value.trim();
   var errEl    = document.getElementById('wfh-r-error'); errEl.style.display='none';
 
-  if(!location){ errEl.textContent='اختر الموقع';  errEl.style.display='block'; return; }
+  if(!floor)    { errEl.textContent='اختر الدور';  errEl.style.display='block'; return; }
+  if(!room)     { errEl.textContent='اختر الصالة / الغرفة';  errEl.style.display='block'; return; }
   if(!sign)     { errEl.textContent='اكتب توقيعك'; errEl.style.display='block'; return; }
 
   var employee, devices;
@@ -1976,6 +2000,8 @@ async function submitReturn(){
       employee:    employee,
       devices:     devices,
       location:    location,
+      floor:       floor,
+      room:        room,
       comment:     fullComment,
       processedBy: sign
     });
