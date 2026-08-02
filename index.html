@@ -753,7 +753,7 @@ function api(action, params) {
     s.src = url;
     s.onerror = function(){ if(done)return; done=true; delete window[cb]; if(s.parentNode) s.parentNode.removeChild(s); reject(new Error('تعذّر الاتصال')); };
     document.head.appendChild(s);
-    setTimeout(function(){ if(!done){ done=true; delete window[cb]; if(s.parentNode) s.parentNode.removeChild(s); reject(new Error('انتهت المهلة')); }}, 90000);
+    setTimeout(function(){ if(!done){ done=true; delete window[cb]; if(s.parentNode) s.parentNode.removeChild(s); reject(new Error('انتهت المهلة')); }}, 120000);
   });
 }
 
@@ -814,10 +814,11 @@ async function loadSettings(){
     var r=await api('getSettings',{spreadsheetId:currentUser.spreadsheetId});
     if(r.success) appSettings=r.data;
   }catch(e){}
+  var DEFAULT_BRANDS=['HP','Dell','Lenovo','Fujitsu','Huawei','Samsung','LG','Acer'];
   try{
     var rb=await api('getBrands',{});
-    if(rb.success) appSettings.brands=rb.data;
-  }catch(e){ appSettings.brands=['HP','Dell','Lenovo','Fujitsu','Huawei','Samsung','LG','Acer']; }
+    appSettings.brands = (rb.success && rb.data && rb.data.length) ? rb.data : DEFAULT_BRANDS;
+  }catch(e){ appSettings.brands=DEFAULT_BRANDS; }
 }
 
 // ===== MOVEMENT =====
@@ -834,14 +835,15 @@ function populateMovementSelects(){
 }
 function fillSelect(id, items){ var s=document.getElementById(id), p=s.value; s.innerHTML='<option value="">-- اختر --</option>'; items.forEach(function(i){ var o=document.createElement('option'); o.value=i; o.textContent=i; s.appendChild(o); }); if(p) s.value=p; }
 function fillSelectFloors(id, floors){ var s=document.getElementById(id); s.innerHTML='<option value="">-- اختر --</option>'; floors.forEach(function(f){ var o=document.createElement('option'); o.value=f; o.textContent=f; s.appendChild(o); }); }
-function filterRooms(prefix){ var floor=document.getElementById('m-'+prefix+'Floor').value, sel=document.getElementById('m-'+prefix+'Room'); sel.innerHTML='<option value="">-- اختر --</option>'; (appSettings.rooms||[]).filter(function(r){ return !floor||r.floor===floor; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; sel.appendChild(o); }); }
+function filterRooms(prefix){ var floor=document.getElementById('m-'+prefix+'Floor').value, sel=document.getElementById('m-'+prefix+'Room'); sel.innerHTML='<option value="">-- اختر --</option>'; var floorNorm=(floor||'').toString().trim().toLowerCase(); (appSettings.rooms||[]).filter(function(r){ return !floorNorm||(r.floor||'').toString().trim().toLowerCase()===floorNorm; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; sel.appendChild(o); }); }
 function fillSeats(nId,lId){ var n=document.getElementById(nId); n.innerHTML='<option value="">--</option>'; for(var i=1;i<=50;i++){ var o=document.createElement('option'); o.value=i; o.textContent=i; n.appendChild(o); } var l=document.getElementById(lId); l.innerHTML='<option value="">--</option>'; for(var c=65;c<=90;c++){ var o2=document.createElement('option'); o2.value=String.fromCharCode(c); o2.textContent=String.fromCharCode(c); l.appendChild(o2); } }
 
 // ===== إرجاع WFH — فلترة الغرف حسب الدور =====
 function filterReturnRooms(){
   var floor = document.getElementById('wfh-r-floor').value, sel = document.getElementById('wfh-r-room');
   sel.innerHTML = '<option value="">-- اختر --</option>';
-  (appSettings.rooms||[]).filter(function(r){ return !floor||r.floor===floor; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; sel.appendChild(o); });
+  var floorNorm=(floor||'').toString().trim().toLowerCase();
+  (appSettings.rooms||[]).filter(function(r){ return !floorNorm||(r.floor||'').toString().trim().toLowerCase()===floorNorm; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; sel.appendChild(o); });
 }
 
 function onSerialInput(){ if(!document.getElementById('m-serial').value.trim()&&autoFilled) clearAutoFilled(); }
@@ -974,7 +976,7 @@ async function showRecent(){
     // لا نعرض chips في وضع "آخر الحركات"
   } catch(e){ setTableLabel('خطأ'); showTableEmpty(); }
 }
-function onDeviceFloorChange(){ var floor=document.getElementById('d-floor').value, rs=document.getElementById('d-room'); rs.innerHTML='<option value="">كل الغرف</option>'; (appSettings.rooms||[]).filter(function(r){ return !floor||r.floor===floor; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; rs.appendChild(o); }); }
+function onDeviceFloorChange(){ var floor=document.getElementById('d-floor').value, rs=document.getElementById('d-room'); rs.innerHTML='<option value="">كل الغرف</option>'; var floorNorm=(floor||'').toString().trim().toLowerCase(); (appSettings.rooms||[]).filter(function(r){ return !floorNorm||(r.floor||'').toString().trim().toLowerCase()===floorNorm; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; rs.appendChild(o); }); }
 async function applyFilter(){
   var floor=document.getElementById('d-floor').value, room=document.getElementById('d-room').value;
   if(!floor&&!room){ await showRecent(); return; }
@@ -1244,6 +1246,7 @@ async function confirmAdd(){
 
 // ===== BULK MOVE =====
 var problemRowEl = null; // الصف اللي فيه مشكلة (نوع الجهاز فاضي)
+var bulkMoveRunId = 0; // يمنع نتايج عملية قديمة من الظهور فوق عملية جديدة
 
 function addBulkRow(serial, deviceType, department, seatNum, seatLetter){
   var container = document.getElementById('bulk-rows-container');
@@ -1422,6 +1425,7 @@ async function bulkLookupTypes(){
 }
 
 function openBulkModal(){
+  bulkMoveRunId++; // ألغي أي عملية قديمة لسه ممكن تكون شغالة في الخلفية
   // صف واحد فاضي فقط
   document.getElementById('bulk-rows-container').innerHTML='';
   addBulkRow();
@@ -1471,7 +1475,8 @@ function closeBulkModal(){ document.getElementById('bulk-modal').classList.remov
 function bulkFilterRooms(){
   var floor=document.getElementById('bulk-toFloor').value, rs=document.getElementById('bulk-toRoom');
   rs.innerHTML='<option value="">-- اختر --</option>';
-  (appSettings.rooms||[]).filter(function(r){ return !floor||r.floor===floor; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; rs.appendChild(o); });
+  var floorNorm=(floor||'').toString().trim().toLowerCase();
+  (appSettings.rooms||[]).filter(function(r){ return !floorNorm||(r.floor||'').toString().trim().toLowerCase()===floorNorm; }).forEach(function(r){ var o=document.createElement('option'); o.value=r.name; o.textContent=r.name; rs.appendChild(o); });
 }
 
 function scrollToProblemRow(){
@@ -1479,6 +1484,7 @@ function scrollToProblemRow(){
 }
 
 async function startBulkMove(){
+  var myRunId = ++bulkMoveRunId; // عملية جديدة رسمياً — أي عملية قديمة تتجاهل من هنا
   var rows = Array.from(document.querySelectorAll('#bulk-rows-container .bulk-row'));
   var devices = [];
   rows.forEach(function(row){
@@ -1533,14 +1539,16 @@ async function startBulkMove(){
   });
 
   var done=0, success=0, failed=0;
-  var BATCH=5;
+  var BATCH=1; // واحد واحد — يطابق طريقة عمل القفل في السيرفر ويمنع مهلة الاتصال
 
   async function processOne(d, i){
+    if(myRunId !== bulkMoveRunId) return; // العملية دي بقت قديمة، متكملش فيها
     var statusEl = document.getElementById('brs-'+i);
     var item     = document.getElementById('bri-'+i);
     statusEl.textContent='جاري...';
     try {
       var lookRes = await api('lookupDevice',{spreadsheetId:currentUser.spreadsheetId, serial:d.serial, assetNumber:''});
+      if(myRunId !== bulkMoveRunId) return; // اتلغت أثناء الانتظار
       var dev = (lookRes.success&&lookRes.device) ? lookRes.device : null;
       var movementData = {
         serial:         d.serial,
@@ -1561,6 +1569,7 @@ async function startBulkMove(){
         notes:        'نقل جماعي'
       };
       var saveRes = await api('saveMovement',{spreadsheetId:currentUser.spreadsheetId, locationName:currentUser.locationName, movementData:movementData, userFullName:currentUser.fullName});
+      if(myRunId !== bulkMoveRunId) return; // اتلغت أثناء الحفظ
       if(saveRes.success){
         success++;
         var fromInfo = dev ? (dev.currentLocation||'مكان غير محدد') : 'جهاز جديد';
@@ -1586,11 +1595,13 @@ async function startBulkMove(){
   }
 
   for(var b=0; b<devices.length; b+=BATCH){
+    if(myRunId !== bulkMoveRunId) return; // اتلغت العملية، متكملش
     var batch   = devices.slice(b, b+BATCH);
     var promises= batch.map(function(d,j){ return processOne(d, b+j); });
     await Promise.all(promises);
   }
 
+  if(myRunId !== bulkMoveRunId) return; // متحدّثش ملخص عملية قديمة اتلغت
   bar.style.width='100%';
   progText.textContent='اكتمل! ✅ '+success+' نجح | ❌ '+failed+' فشل';
   showToast('✅ '+success+' جهاز اتنقل'+(failed?' | ❌ '+failed+' فشلوا':''), success>0?'success':'error');
