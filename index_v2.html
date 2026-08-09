@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>نظام تتبع الأصول — V2</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;
+  --border:#e0e0e0;--border2:#f0f0f0;
+  --text:#1a1a2e;--text2:#555;--text3:#888;
+  --primary:#4f46e5;--primary-dark:#4338ca;--primary-light:#ede9fe;--primary-text:#5b21b6;
+  --success:#16a34a;--success-bg:#f0fdf4;
+  --danger:#dc2626;--danger-bg:#fef2f2;--danger-border:#fca5a5;
+  --shadow:0 2px 8px rgba(0,0,0,.06);--shadow2:0 4px 24px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#16a34a}.toast.error{background:#dc2626}
+.login-card{background:var(--surface);border-radius:16px;padding:2rem;width:100%;max-width:380px;box-shadow:var(--shadow2);margin:1rem}
+.logo{text-align:center;margin-bottom:1.5rem}
+.logo h1{font-size:20px;margin-top:8px}
+.logo p{font-size:13px;color:var(--text3);margin-top:4px}
+.form-group{margin-bottom:1rem}
+label{font-size:13px;color:var(--text2);display:block;margin-bottom:6px}
+input,select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:var(--surface);color:var(--text);font-family:inherit}
+input:focus,select:focus{border-color:var(--primary)}
+.btn-primary{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;margin-top:.5rem;font-family:inherit}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.error-box{background:var(--danger-bg);color:var(--danger);padding:10px;border-radius:8px;font-size:13px;margin-top:1rem;text-align:center;display:none}
+.navbar{background:var(--surface);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);position:sticky;top:0;z-index:50}
+.navbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{background:var(--surface2);border:none;border-radius:8px;padding:6px 12px;color:var(--primary);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.user-info{font-size:13px;color:var(--text3);display:flex;align-items:center;gap:10px}
+.logout-btn{font-size:12px;color:var(--danger);cursor:pointer;border:1px solid var(--danger-border);padding:4px 10px;border-radius:6px;background:var(--danger-bg)}
+.page{display:none!important;min-height:100vh}
+.page.active{display:block!important}
+#page-login{display:none!important}
+#page-login.active{display:flex!important;align-items:center;justify-content:center;min-height:100vh}
+.content{padding:1.5rem;max-width:700px;margin:0 auto}
+#page-devices .content{max-width:100%;padding:1rem 1.5rem}
+.location-badge{background:var(--primary-light);color:var(--primary-text);padding:6px 14px;border-radius:20px;font-size:13px;margin-bottom:1.5rem;display:inline-block}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.menu-card{background:var(--surface);border-radius:16px;padding:2rem 1rem;text-align:center;cursor:pointer;border:2px solid transparent;box-shadow:var(--shadow)}
+.menu-card:hover{border-color:var(--primary)}
+.menu-card .card-icon{font-size:40px;margin-bottom:.75rem;display:block}
+.menu-card h3{font-size:15px}
+.menu-card p{font-size:12px;color:var(--text3);margin-top:4px}
+.section{background:var(--surface);border-radius:16px;padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.section-title{font-size:14px;font-weight:600;color:var(--primary);margin-bottom:1rem;padding-bottom:8px;border-bottom:2px solid var(--primary-light)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.submit-btn{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:16px;cursor:pointer;font-family:inherit}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.opt-badge{font-size:11px;background:var(--primary-light);color:var(--primary-text);padding:2px 8px;border-radius:10px;margin-right:6px}
+.search-bar{display:flex;gap:8px;margin-bottom:1rem}
+.search-bar input{flex:1}
+.search-btn{padding:10px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit;white-space:nowrap}
+.filter-bar{background:var(--surface);border-radius:12px;padding:1rem;margin-bottom:1rem;box-shadow:var(--shadow);display:flex;gap:8px;flex-wrap:wrap}
+.filter-bar select{flex:1;min-width:120px}
+.filter-btn{padding:10px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap}
+.clear-btn{padding:10px 16px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap}
+.stats-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}
+.stat-card{background:var(--surface);border-radius:10px;padding:8px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;min-width:70px}
+.stat-num{font-size:20px;font-weight:700;color:var(--primary)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+.table-wrap{overflow-x:auto;width:100%;background:var(--surface);border-radius:12px;box-shadow:var(--shadow)}
+.loading-msg,.empty-msg{text-align:center;padding:2rem;color:var(--text3);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px}
+thead tr{background:var(--surface2)}
+th{text-align:right;padding:10px 12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border2);white-space:nowrap}
+.device-row{cursor:pointer}
+.device-row:hover{background:var(--primary-light)}
+.seat-badge{background:var(--primary-light);color:var(--primary-text);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem}
+.modal.show{display:flex}
+.modal-card{background:var(--surface);border-radius:16px;width:100%;max-width:560px;overflow:hidden;margin:auto}
+.modal-header{background:var(--primary);color:#fff;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.modal-body{padding:1.5rem;overflow-y:auto;max-height:80vh}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-item{background:var(--surface2);border-radius:8px;padding:8px 12px}
+.detail-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.detail-value{font-size:13px;font-weight:500;word-break:break-all}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div id="page-login" class="page active">
+  <div class="login-card">
+    <div class="logo"><div style="font-size:48px">📦</div><h1>نظام تتبع الأصول</h1><p>النسخة الجديدة — سجّل دخولك</p></div>
+    <div class="form-group"><label>اسم المستخدم</label><input type="text" id="inp-username" autocomplete="username"></div>
+    <div class="form-group"><label>كلمة المرور</label><input type="password" id="inp-password" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()"></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">دخول</button>
+    <div class="error-box" id="login-error"></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="page-home" class="page">
+  <div class="navbar">
+    <div class="navbar-left"><h2>📦 نظام تتبع الأصول</h2></div>
+    <div class="user-info"><span id="nav-username"></span><span class="logout-btn" onclick="doLogout()">خروج</span></div>
+  </div>
+  <div class="content" style="padding-top:2rem">
+    <div class="location-badge">📍 <span id="home-location"></span></div>
+    <div class="menu-grid">
+      <div class="menu-card" onclick="openMovementPage()"><span class="card-icon">🔄</span><h3>تسجيل حركة نقل</h3><p>نقل جهاز من موقع لآخر</p></div>
+      <div class="menu-card" onclick="openDevicesPage()"><span class="card-icon">🖥️</span><h3>عرض الأجهزة</h3><p>بحث وفلترة</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOVEMENT -->
+<div id="page-movement" class="page">
+  <div class="navbar">
+    <div class="navbar-left"><button class="back-btn" onclick="goHome()">→ رجوع</button><h2>تسجيل حركة نقل</h2></div>
+  </div>
+  <div class="content">
+    <div class="section">
+      <div class="section-title">📋 بيانات الجهاز</div>
+      <div class="form-group"><label>Serial Number</label><input type="text" id="m-serial" oninput="onFieldChange()"></div>
+      <div class="form-group"><label>رقم الأصل</label><input type="text" id="m-asset" oninput="onFieldChange()"></div>
+      <div class="form-group"><label>نوع الجهاز</label><input type="text" id="m-deviceType"></div>
+      <div class="form-group"><label>الإدارة</label><input type="text" id="m-department"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">📍 من الموقع القديم <span class="opt-badge">بيتملى تلقائي</span></div>
+      <div class="form-group"><label>الموقع</label><input type="text" id="m-fromLocation" readonly></div>
+      <div class="grid2">
+        <div class="form-group"><label>الدور</label><input type="text" id="m-fromFloor" readonly></div>
+        <div class="form-group"><label>الغرفة</label><input type="text" id="m-fromRoom" readonly></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🚀 إلى الموقع الجديد</div>
+      <div class="form-group"><label>الفرع</label><select id="m-toBranch"></select></div>
+      <div class="grid2">
+        <div class="form-group"><label>الدور</label><input type="text" id="m-toFloor"></div>
+        <div class="form-group"><label>الغرفة</label><input type="text" id="m-toRoom"></div>
+      </div>
+      <div class="grid2">
+        <div class="form-group"><label>رقم Seat</label><input type="text" id="m-toSeatNum"></div>
+        <div class="form-group"><label>حرف Seat</label><input type="text" id="m-toSeatLetter"></div>
+      </div>
+      <div class="form-group"><label>رقم التيكت <span class="opt-badge">اختياري</span></label><input type="text" id="m-ticket"></div>
+      <div class="form-group"><label>ملاحظات <span class="opt-badge">اختياري</span></label><input type="text" id="m-notes"></div>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitMovement()">✅ تسجيل الحركة</button>
+    <div class="error-box" id="m-error"></div>
+  </div>
+</div>
+
+<!-- DEVICES -->
+<div id="page-devices" class="page">
+  <div class="navbar">
+    <div class="navbar-left"><button class="back-btn" onclick="goHome()">→ رجوع</button><h2>🖥️ عرض الأجهزة</h2></div>
+  </div>
+  <div class="content">
+    <div class="search-bar">
+      <input type="text" id="d-search" placeholder="🔍 ابحث بـ Serial أو رقم الأصل..." onkeydown="if(event.key==='Enter') doSearch()">
+      <button class="search-btn" onclick="doSearch()">بحث</button>
+    </div>
+    <div class="filter-bar">
+      <select id="d-floor" onchange="applyFilter()"><option value="">كل الأدوار</option></select>
+      <button class="clear-btn" onclick="clearFilters()">مسح الفلتر</button>
+    </div>
+    <div class="stats-bar" id="stats-bar"></div>
+    <div class="table-wrap">
+      <div class="loading-msg" id="d-loading" style="display:none">⏳ جاري التحميل...</div>
+      <div class="empty-msg" id="d-empty" style="display:none">لا توجد نتائج</div>
+      <table id="d-table" style="display:none">
+        <thead><tr><th>#</th><th>Serial</th><th>رقم الأصل</th><th>النوع</th><th>الإدارة</th><th>الدور</th><th>الغرفة</th><th>Seat</th><th>آخر تحرك</th></tr></thead>
+        <tbody id="d-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DEVICE MODAL -->
+<div class="modal" id="device-modal">
+  <div class="modal-card">
+    <div class="modal-header"><h3 id="dm-title">تفاصيل الجهاز</h3><button class="modal-close" onclick="closeDeviceModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Serial</div><div class="detail-value" id="dm-serial">—</div></div>
+        <div class="detail-item"><div class="detail-label">رقم الأصل</div><div class="detail-value" id="dm-asset">—</div></div>
+        <div class="detail-item"><div class="detail-label">النوع</div><div class="detail-value" id="dm-type">—</div></div>
+        <div class="detail-item"><div class="detail-label">الإدارة</div><div class="detail-value" id="dm-dept">—</div></div>
+        <div class="detail-item"><div class="detail-label">الدور</div><div class="detail-value" id="dm-floor">—</div></div>
+        <div class="detail-item"><div class="detail-label">الغرفة</div><div class="detail-value" id="dm-room">—</div></div>
+        <div class="detail-item"><div class="detail-label">Seat</div><div class="detail-value" id="dm-seat">—</div></div>
+        <div class="detail-item"><div class="detail-label">آخر تحرك</div><div class="detail-value" id="dm-lastmove">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// إعدادات الاتصال بـ Supabase
+// ============================================================
+var SUPABASE_URL = 'https://lzbytmwzmqloyvatijlz.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_y8sV9kQLhYiGFpAwF_pBdg_SDCHXxeW';
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var SESSION_KEY = 'ats_v2_session', SESSION_MAX = 8*60*60*1000;
+var currentUser = null;
+var branches = []; // [{id, name}]
+var lastLookedUpSerial = '', lastLookedUpAsset = '', lookupTimer = null, foundDevice = null;
+var allDevices = [], filteredDevices = [];
+
+// ===== TOAST =====
+function showToast(msg, type){ var t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+(type||'success'); setTimeout(function(){t.className='toast';},3200); }
+
+// ===== SESSION =====
+function saveSession(u){ try{ localStorage.setItem(SESSION_KEY, JSON.stringify({user:u, ts:Date.now()})); }catch(e){} }
+function loadSession(){ try{ var r=localStorage.getItem(SESSION_KEY); if(!r)return null; var d=JSON.parse(r); if(Date.now()-d.ts>SESSION_MAX){ localStorage.removeItem(SESSION_KEY); return null; } return d.user; }catch(e){ return null; } }
+function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+
+// ===== PAGES =====
+function showPage(id){ document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');}); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
+function goHome(){ showHome(); }
+
+// ===== LOGIN =====
+async function doLogin(){
+  var u = document.getElementById('inp-username').value.trim();
+  var p = document.getElementById('inp-password').value.trim();
+  var errEl = document.getElementById('login-error'); errEl.style.display='none';
+  if(!u||!p){ errEl.textContent='اكتب اسم المستخدم وكلمة المرور'; errEl.style.display='block'; return; }
+  var btn = document.getElementById('login-btn'); btn.disabled=true; btn.textContent='جاري التحقق...';
+  try{
+    var { data, error } = await sb.rpc('login_user', { p_username: u, p_password: p });
+    if(error) throw error;
+    if(!data || !data.length){ errEl.textContent='اسم المستخدم أو كلمة المرور غلط'; errEl.style.display='block'; return; }
+    currentUser = data[0];
+    saveSession(currentUser);
+    await loadBranches();
+    showHome();
+  }catch(e){ errEl.textContent='خطأ: '+e.message; errEl.style.display='block'; }
+  finally{ btn.disabled=false; btn.textContent='دخول'; }
+}
+function doLogout(){ currentUser=null; clearSession(); document.getElementById('inp-username').value=''; document.getElementById('inp-password').value=''; showPage('page-login'); }
+function showHome(){
+  document.getElementById('nav-username').textContent = currentUser.full_name;
+  document.getElementById('home-location').textContent = currentUser.branch_name;
+  showPage('page-home');
+}
+async function loadBranches(){
+  var { data, error } = await sb.from('branches').select('id,name').order('name');
+  if(!error) branches = data || [];
+}
+
+// ===== MOVEMENT =====
+function openMovementPage(){
+  showPage('page-movement');
+  resetMovementForm();
+  var sel = document.getElementById('m-toBranch');
+  sel.innerHTML = '<option value="">-- اختر --</option>';
+  branches.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=b.name; sel.appendChild(o); });
+}
+function resetMovementForm(){
+  ['m-serial','m-asset','m-deviceType','m-department','m-fromLocation','m-fromFloor','m-fromRoom','m-toFloor','m-toRoom','m-toSeatNum','m-toSeatLetter','m-ticket','m-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('m-toBranch').value='';
+  foundDevice = null; lastLookedUpSerial=''; lastLookedUpAsset='';
+  hideMovError();
+}
+function onFieldChange(){
+  var serial = document.getElementById('m-serial').value.trim();
+  var asset  = document.getElementById('m-asset').value.trim();
+  if(!serial && !asset) return;
+  if(serial===lastLookedUpSerial && asset===lastLookedUpAsset) return;
+  clearTimeout(lookupTimer);
+  lookupTimer = setTimeout(function(){ lookupDevice(serial, asset); }, 500);
+}
+async function lookupDevice(serial, asset){
+  lastLookedUpSerial = serial; lastLookedUpAsset = asset;
+  var query = sb.from('devices').select('*, branches(name)');
+  if(serial) query = query.ilike('serial', serial);
+  else if(asset) query = query.ilike('asset_number', asset);
+  var { data, error } = await query.limit(1);
+  if(error || !data || !data.length){ foundDevice = null; return; }
+  var d = data[0];
+  foundDevice = d;
+  document.getElementById('m-serial').value = d.serial || serial;
+  document.getElementById('m-asset').value = d.asset_number || asset;
+  document.getElementById('m-deviceType').value = d.device_type || '';
+  document.getElementById('m-department').value = d.department || '';
+  document.getElementById('m-fromLocation').value = d.branches ? d.branches.name : '';
+  document.getElementById('m-fromFloor').value = d.floor || '';
+  document.getElementById('m-fromRoom').value = d.room || '';
+}
+async function submitMovement(){
+  var serial = document.getElementById('m-serial').value.trim();
+  var asset  = document.getElementById('m-asset').value.trim();
+  var toBranchId = document.getElementById('m-toBranch').value;
+  if(!serial && !asset){ showMovError('لازم تكتب Serial Number أو رقم الأصل'); return; }
+  if(!toBranchId){ showMovError('لازم تختار الفرع الجديد'); return; }
+
+  var btn = document.getElementById('submit-btn'); btn.disabled=true; btn.textContent='جاري الحفظ...'; hideMovError();
+
+  var toFloor = document.getElementById('m-toFloor').value.trim();
+  var toRoom  = document.getElementById('m-toRoom').value.trim();
+  var toSeatNum = document.getElementById('m-toSeatNum').value.trim();
+  var toSeatLetter = document.getElementById('m-toSeatLetter').value.trim();
+  var toBranchName = branches.find(function(b){ return b.id===toBranchId; }).name;
+
+  try{
+    var deviceId = foundDevice ? foundDevice.id : null;
+    var deviceType = document.getElementById('m-deviceType').value.trim();
+    var department = document.getElementById('m-department').value.trim();
+
+    // سجّل الحركة في التاريخ
+    await sb.from('movements').insert({
+      device_id: deviceId,
+      moved_by: currentUser.full_name,
+      serial: serial || null,
+      asset_number: asset || null,
+      device_type: deviceType,
+      department: department,
+      from_location: document.getElementById('m-fromLocation').value,
+      from_floor: document.getElementById('m-fromFloor').value,
+      from_room: document.getElementById('m-fromRoom').value,
+      to_location: toBranchName,
+      to_floor: toFloor,
+      to_room: toRoom,
+      to_seat_num: toSeatNum,
+      to_seat_letter: toSeatLetter,
+      ticket_number: document.getElementById('m-ticket').value.trim(),
+      notes: document.getElementById('m-notes').value.trim()
+    });
+
+    // حدّث/أضف الجهاز — مفيش تعقيد فروع منفصلة خالص، صف واحد بس
+    if(deviceId){
+      await sb.from('devices').update({
+        branch_id: toBranchId, floor: toFloor, room: toRoom,
+        seat_number: toSeatNum, seat_letter: toSeatLetter,
+        device_type: deviceType, department: department,
+        last_movement: new Date().toISOString(), moved_by: currentUser.full_name
+      }).eq('id', deviceId);
+    } else {
+      await sb.from('devices').insert({
+        serial: serial || null, asset_number: asset || null,
+        device_type: deviceType, department: department,
+        branch_id: toBranchId, floor: toFloor, room: toRoom,
+        seat_number: toSeatNum, seat_letter: toSeatLetter,
+        last_movement: new Date().toISOString(), moved_by: currentUser.full_name
+      });
+    }
+
+    showToast('✅ تم تسجيل الحركة بنجاح!');
+    setTimeout(resetMovementForm, 400);
+  }catch(e){ showMovError('خطأ: '+e.message); }
+  finally{ btn.disabled=false; btn.textContent='✅ تسجيل الحركة'; }
+}
+function showMovError(m){ var el=document.getElementById('m-error'); el.textContent=m; el.style.display='block'; }
+function hideMovError(){ document.getElementById('m-error').style.display='none'; }
+
+// ===== DEVICES PAGE =====
+async function openDevicesPage(){
+  showPage('page-devices');
+  document.getElementById('d-search').value='';
+  await loadDevices();
+}
+async function loadDevices(){
+  showTableLoading();
+  var { data, error } = await sb.from('devices').select('*').eq('branch_id', currentUser.branch_id).order('last_movement', {ascending:false});
+  if(error){ showTableEmpty(); showToast('❌ '+error.message,'error'); return; }
+  allDevices = data || [];
+  filteredDevices = allDevices.slice();
+  populateFloorFilter();
+  renderDevicesTable(filteredDevices);
+}
+function populateFloorFilter(){
+  var floors = Array.from(new Set(allDevices.map(function(d){return d.floor;}).filter(Boolean)));
+  var sel = document.getElementById('d-floor');
+  sel.innerHTML = '<option value="">كل الأدوار</option>';
+  floors.sort().forEach(function(f){ var o=document.createElement('option'); o.value=f; o.textContent=f; sel.appendChild(o); });
+}
+function applyFilter(){
+  var floor = document.getElementById('d-floor').value;
+  filteredDevices = allDevices.filter(function(d){ return !floor || d.floor===floor; });
+  renderDevicesTable(filteredDevices);
+}
+function clearFilters(){ document.getElementById('d-floor').value=''; document.getElementById('d-search').value=''; filteredDevices=allDevices.slice(); renderDevicesTable(filteredDevices); }
+async function doSearch(){
+  var q = document.getElementById('d-search').value.trim();
+  if(!q){ filteredDevices=allDevices.slice(); renderDevicesTable(filteredDevices); return; }
+  showTableLoading();
+  var { data, error } = await sb.from('devices').select('*').or('serial.ilike.%'+q+'%,asset_number.ilike.%'+q+'%').limit(100);
+  if(error){ showTableEmpty(); return; }
+  filteredDevices = data || [];
+  renderDevicesTable(filteredDevices);
+}
+function updateStats(rows){
+  var tc={}; rows.forEach(function(r){ var t=r.device_type||'غير محدد'; tc[t]=(tc[t]||0)+1; });
+  var h='<div class="stat-card"><span class="stat-num">'+rows.length+'</span><span class="stat-label">إجمالي</span></div>';
+  Object.entries(tc).sort(function(a,b){return b[1]-a[1];}).slice(0,8).forEach(function(e){ h+='<div class="stat-card"><span class="stat-num">'+e[1]+'</span><span class="stat-label">'+e[0]+'</span></div>'; });
+  document.getElementById('stats-bar').innerHTML=h;
+}
+function renderDevicesTable(rows){
+  updateStats(rows);
+  var tbody=document.getElementById('d-body');
+  if(!rows.length){ showTableEmpty(); return; }
+  document.getElementById('d-empty').style.display='none';
+  document.getElementById('d-loading').style.display='none';
+  document.getElementById('d-table').style.display='table';
+  tbody.innerHTML='';
+  rows.forEach(function(d,i){
+    var seat=[d.seat_number,d.seat_letter].filter(Boolean).join('');
+    var dt=d.last_movement?new Date(d.last_movement).toLocaleDateString('ar-EG'):'—';
+    var tr=document.createElement('tr'); tr.className='device-row';
+    tr.onclick=function(){ openDeviceModal(d); };
+    tr.innerHTML='<td>'+(i+1)+'</td><td>'+(d.serial||'—')+'</td><td>'+(d.asset_number||'—')+'</td><td>'+(d.device_type||'—')+'</td><td>'+(d.department||'—')+'</td><td>'+(d.floor||'—')+'</td><td>'+(d.room||'—')+'</td><td>'+(seat?'<span class="seat-badge">'+seat+'</span>':'—')+'</td><td>'+dt+'</td>';
+    tbody.appendChild(tr);
+  });
+}
+function showTableLoading(){ document.getElementById('d-loading').style.display='block'; document.getElementById('d-table').style.display='none'; document.getElementById('d-empty').style.display='none'; document.getElementById('stats-bar').innerHTML=''; }
+function showTableEmpty(){ document.getElementById('d-loading').style.display='none'; document.getElementById('d-table').style.display='none'; document.getElementById('d-empty').style.display='block'; }
+
+function openDeviceModal(d){
+  document.getElementById('dm-title').textContent = d.device_type||'تفاصيل الجهاز';
+  document.getElementById('dm-serial').textContent = d.serial||'—';
+  document.getElementById('dm-asset').textContent = d.asset_number||'—';
+  document.getElementById('dm-type').textContent = d.device_type||'—';
+  document.getElementById('dm-dept').textContent = d.department||'—';
+  document.getElementById('dm-floor').textContent = d.floor||'—';
+  document.getElementById('dm-room').textContent = d.room||'—';
+  document.getElementById('dm-seat').textContent = [d.seat_number,d.seat_letter].filter(Boolean).join('')||'—';
+  document.getElementById('dm-lastmove').textContent = d.last_movement?new Date(d.last_movement).toLocaleString('ar-EG'):'—';
+  document.getElementById('device-modal').classList.add('show');
+}
+function closeDeviceModal(){ document.getElementById('device-modal').classList.remove('show'); }
+
+// ===== INIT =====
+(async function init(){
+  var saved = loadSession();
+  if(saved){ currentUser=saved; await loadBranches(); showHome(); }
+})();
+</script>
+</body>
+</html>
