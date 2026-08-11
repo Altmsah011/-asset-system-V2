@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>نظام تتبع الأصول — V2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root {
   --bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;
@@ -86,6 +87,13 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);white-space:nowrap}
 .detail-item{background:var(--surface2);border-radius:8px;padding:8px 12px}
 .detail-label{font-size:11px;color:var(--text3);margin-bottom:2px}
 .detail-value{font-size:13px;font-weight:500;word-break:break-all}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-wrap input{flex:1}
+.scan-btn{position:absolute;left:8px;background:none;border:none;cursor:pointer;font-size:22px;padding:4px;line-height:1}
+#scanner-container{display:none;background:rgba(0,0,0,.95);border-radius:16px;padding:1rem;margin-bottom:1rem;text-align:center}
+#scanner-container.show{display:block}
+#reader{width:100%;max-width:300px;margin:0 auto;border-radius:12px;overflow:hidden}
+.scanner-close-btn{margin-top:12px;padding:8px 20px;background:#dc2626;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit}
 </style>
 </head>
 <body>
@@ -126,8 +134,13 @@ td{padding:10px 12px;border-bottom:1px solid var(--border2);white-space:nowrap}
   <div class="content">
     <div class="section">
       <div class="section-title">📋 بيانات الجهاز</div>
-      <div class="form-group"><label>Serial Number</label><input type="text" id="m-serial" oninput="onFieldChange()"></div>
-      <div class="form-group"><label>رقم الأصل</label><input type="text" id="m-asset" oninput="onFieldChange()"></div>
+      <div id="scanner-container"><div id="reader"></div><button class="scanner-close-btn" onclick="stopScanner()">✕ إغلاق الكاميرا</button></div>
+      <div class="form-group"><label>Serial Number</label>
+        <div class="input-wrap"><input type="text" id="m-serial" oninput="onFieldChange()"><button class="scan-btn" onclick="startScan('m-serial')">📷</button></div>
+      </div>
+      <div class="form-group"><label>رقم الأصل</label>
+        <div class="input-wrap"><input type="text" id="m-asset" oninput="onFieldChange()"><button class="scan-btn" onclick="startScan('m-asset')">📷</button></div>
+      </div>
       <div class="form-group"><label>نوع الجهاز</label><input type="text" id="m-deviceType"></div>
       <div class="form-group"><label>الإدارة</label><input type="text" id="m-department"></div>
     </div>
@@ -227,7 +240,7 @@ function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} 
 
 // ===== PAGES =====
 function showPage(id){ document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');}); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
-function goHome(){ showHome(); }
+function goHome(){ if(typeof activeScanner!=='undefined' && activeScanner) stopScanner(); showHome(); }
 
 // ===== LOGIN =====
 async function doLogin(){
@@ -363,6 +376,27 @@ async function submitMovement(){
 function showMovError(m){ var el=document.getElementById('m-error'); el.textContent=m; el.style.display='block'; }
 function hideMovError(){ document.getElementById('m-error').style.display='none'; }
 
+// ===== SCANNER =====
+var activeScanner = null, activeScanField = null;
+function startScan(fieldId){
+  if(activeScanner){ stopScanner(); return; }
+  activeScanField = fieldId;
+  document.getElementById('scanner-container').classList.add('show');
+  activeScanner = new Html5Qrcode('reader');
+  activeScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:280,height:180}},
+    function(text){ document.getElementById(activeScanField).value=text; stopScanner(); onFieldChange(); },
+    function(){}
+  ).catch(function(err){ stopScanner(); showToast('❌ تعذّر تشغيل الكاميرا: '+err,'error'); });
+}
+function stopScanner(){
+  if(activeScanner){
+    activeScanner.stop().catch(function(){}).finally(function(){
+      activeScanner=null;
+      document.getElementById('scanner-container').classList.remove('show');
+    });
+  }
+}
+
 // ===== DEVICES PAGE =====
 async function openDevicesPage(){
   showPage('page-devices');
@@ -371,9 +405,17 @@ async function openDevicesPage(){
 }
 async function loadDevices(){
   showTableLoading();
-  var { data, error } = await sb.from('devices').select('*').eq('branch_id', currentUser.branch_id).order('last_movement', {ascending:false});
-  if(error){ showTableEmpty(); showToast('❌ '+error.message,'error'); return; }
-  allDevices = data || [];
+  var rows = [];
+  var pageSize = 1000, from = 0;
+  while(true){
+    var { data, error } = await sb.from('devices').select('*').eq('branch_id', currentUser.branch_id).order('last_movement', {ascending:false}).range(from, from+pageSize-1);
+    if(error){ showTableEmpty(); showToast('❌ '+error.message,'error'); return; }
+    if(!data || !data.length) break;
+    rows = rows.concat(data);
+    if(data.length < pageSize) break;
+    from += pageSize;
+  }
+  allDevices = rows;
   filteredDevices = allDevices.slice();
   populateFloorFilter();
   renderDevicesTable(filteredDevices);
